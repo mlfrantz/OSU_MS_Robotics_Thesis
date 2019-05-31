@@ -1,0 +1,12 @@
+Test I want to run
+what constraints I want (4 or 5)?
+What enviroments do I want to test in?
+	Some systematic events?
+		fake symettries? make sure it behaves systematically?
+	ROMS data?
+Which comparisons do I want to do?
+	Other algorithms?
+Outline for my report
+	What do I want to include
+	What is in/out of scope?
+Timeline 
