@@ -10,7 +10,7 @@ from gurobipy import *
 Np = int(sys.argv[1])
 steps = range(Np)
 start = (10, 17)
-end = (10, 10)
+# end = (10, 10)
 
 # Problem data, matrix transposed to allow for proper x,y coordinates to be mapped wih i,j
 field = np.genfromtxt('test_fields/test_field_2.csv', delimiter=',', dtype=float).transpose()
@@ -21,7 +21,7 @@ numX = len(DX) # Number of X Positions
 numY = len(DY) # Number of Y Positions
 
 m = Model()
-m.Params.TIME_LIMIT = 600.0
+m.Params.TIME_LIMIT = 60.0
 # m.Params.MIPGap = 0.01
 
 x = m.addVars(steps, lb=DX[0], ub=DX[-1], vtype=GRB.INTEGER, name='x')
