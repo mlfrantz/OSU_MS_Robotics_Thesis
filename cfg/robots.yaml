@@ -1,0 +1,39 @@
+glider1:
+  vel: 0.4 # m/s
+  type: 'glider'
+  color: 'orange'
+
+glider2:
+  vel: 0.4 # m/s
+  type: 'glider'
+  color: 'green'
+
+glider3:
+  vel: 0.4 # m/s
+  type: 'glider'
+  color: 'blue'
+
+glider4:
+  vel: 0.4 # m/s
+  type: 'glider'
+  color: 'white'
+
+rose1:
+  vel: 1.5 # m/s
+  type: 'rose'
+  color: 'pink'
+
+rose2:
+  vel: 1.5 # m/s
+  type: 'rose'
+  color: 'red'
+
+rose3:
+  vel: 1.5 # m/s
+  type: 'rose'
+  color: 'yellow'
+
+rose4:
+  vel: 1.5 # m/s
+  type: 'rose'
+  color: 'purple'
