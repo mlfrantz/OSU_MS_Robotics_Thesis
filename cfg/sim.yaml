@@ -1,0 +1,61 @@
+# Simulation Time Step (Seconds)
+sim_period: 30
+
+# ROMS File to use for simulation
+roms_file: "data/roms_data/txla_roms/txla_hindcast_jun_1_2011.nc"
+
+# Obstacles
+generate_dynamic_obstacles: True
+
+science_variable: "temperature"
+
+# Region of the ocean to simulate using roms data
+sim_world:
+  center_latitude: 28.75      #Box Center (Decimal Degrees Latitude)
+  center_longitude: -93.25    #Box Center (Decimal Degrees Longitude)
+  width: 30                    #Box Width (km)
+  height: 30                   #Box Height (km)
+  resolution: .5              #World Resolution (km)
+
+sim_duration: Null # Length of Simulation (s).  Use Null for no maximum length
+
+vehicle_spawn_time: 3600 # Mission time (s) after which the vehicles are deployed.
+
+# Initial Parameters for vehicles in environment
+init:
+  drifter:
+    transform_angle: 45.0
+    xpos: 0.0
+    ypos: -2.5
+
+  rose1:
+    xpos: 1.0
+    ypos: 1.0
+
+  rose2:
+    xpos: -1.0
+    ypos: -1.0
+
+  rose3:
+    xpos: 1.0
+    ypos: -1.0
+
+  rose4:
+    xpos: -1.0
+    ypos: 1.0
+
+  osu686:
+    xpos: -2.0
+    ypos: 2.0
+
+  osu683:
+    xpos: 2.0
+    ypos: -2.0
+
+  osu684:
+    xpos: -2.0
+    ypos: -2.0
+
+  osu685:
+    xpos: 2.0
+    ypos: 2.0
