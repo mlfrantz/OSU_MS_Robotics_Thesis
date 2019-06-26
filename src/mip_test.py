@@ -5,6 +5,7 @@ import oyaml as yaml
 import numpy as np
 import matplotlib.pyplot as plt
 from gurobipy import *
+from sas_utils import World, Location
 
 def main():
 
@@ -41,6 +42,13 @@ def main():
         type=str,
         default='cfg/robots.yaml',
         help='Configuration file of robots availalbe for planning.',
+        )
+    parser.add_argument(
+        '--sim_cfg',
+        nargs='?',
+        type=str,
+        default='cfg/sim.yaml',
+        help='Simulation-specific configuration file name.',
         )
     parser.add_argument(
         '-n', '--planning_time',
@@ -154,7 +162,26 @@ def main():
     robots = range(len(args.robots))
 
     # Problem data, matrix transposed to allow for proper x,y coordinates to be mapped wih i,j
-    field = np.genfromtxt(args.infile_path, delimiter=',', dtype=float).transpose()
+    # field = np.genfromtxt(args.infile_path, delimiter=',', dtype=float).transpose()
+
+    # Loading Simulation-Specific Parameters
+    with open(os.path.expandvars(args.sim_cfg),'rb') as f:
+        yaml_sim = yaml.load(f.read())
+
+    wd = World.roms(
+        datafile_path=yaml_sim['roms_file'],
+        xlen        = yaml_sim['sim_world']['width'],
+        ylen        = yaml_sim['sim_world']['height'],
+        center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
+        feature     = yaml_sim['science_variable'],
+        resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
+        )
+
+    # This is the scalar_field in a static word.
+    # The '0' is the first time step and goes up to some max time
+    field = wd.scalar_field[:,:,0]
+
+    field_resolution = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution'])
 
     if args.gradient:
         grad_field = np.gradient(field)

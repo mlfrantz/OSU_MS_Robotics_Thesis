@@ -13,10 +13,10 @@ from matplotlib import cm
 def getROMSData(datafile_path, feature):
   #Load a single Roms Feature as a scalar field, return the field and its bounds
   #Note that the field is a masked array, so all locations within the bounds are not guaranteed to be valid
-
-
+  print(datafile_path, feature)
   if 'txla' in datafile_path:
     #ROMS Data is from Texas - Lousisiana Dataset
+    # print("Roms Data is from Texas - Lousisiana")
     return loadTXLAROMSData(datafile_path, feature)
     # scalar_field, scalar_lat, scalar_lon, roms_t = loadTXLAROMSData(datafile_path, feature)
     # current_u, u_lat, u_lon, _ = loadTXLAROMSData(datafile_path, "current_u")
@@ -50,13 +50,13 @@ def getROMSData(datafile_path, feature):
 #    lat = roms_dataset['lat_u'][:,0]
 #    lon = roms_dataset['lon_u'][0,:]
 
-#    scalar_field = roms_dataset['u'][0,39,:,:]   
+#    scalar_field = roms_dataset['u'][0,39,:,:]
 
 #  elif feature == 'current_v' or feature == "v":
 #    lat = roms_dataset['lat_v'][:,0]
 #    lon = roms_dataset['lon_v'][0,:]
 
-#    scalar_field = roms_dataset['v'][0,39,:,:]  
+#    scalar_field = roms_dataset['v'][0,39,:,:]
 
 
 #  if bounds is not None and resolution is not None:
@@ -69,7 +69,7 @@ def getROMSData(datafile_path, feature):
 # def loadMontereyROMSData(datafile_path, feature="temperature", bounds=None, resolution=None):
 #  roms_dataset = nc.Dataset(datafile_path)
 
-  
+
 #  if feature == "temp" or feature == "temperature":
 #    scalar_field, lat, lon = slice(roms_dataset, 'temp')
 
@@ -108,13 +108,13 @@ def loadTXLAROMSData(datafile_path, feature='temperature'):
     lat = roms_dataset['lat_u'][:]
     lon = roms_dataset['lon_u'][:]
     times = roms_dataset['ocean_time'][:]
-    scalar_field = roms_dataset['u'][:,0,:,:]   
+    scalar_field = roms_dataset['u'][:,0,:,:]
 
   elif feature == 'current_v' or feature == "v":
     lat = roms_dataset['lat_v'][:]
     lon = roms_dataset['lon_v'][:]
     times = roms_dataset['ocean_time'][:]
-    scalar_field = roms_dataset['v'][:,0,:,:]  
+    scalar_field = roms_dataset['v'][:,0,:,:]
 
   return scalar_field, lat, lon, times
 
@@ -133,7 +133,7 @@ def reshapeROMS(roms_field, roms_lat, roms_lon, bounds, output_shape):
   lon_coords = roms_lon.flatten()
 
   pts = np.vstack((lon_coords, lat_coords)).transpose()
-  
+
   reshaped_field = np.empty(output_shape)
   for t_idx in tqdm(range(output_shape[2])):
     data = roms_field[t_idx].data.flatten()
