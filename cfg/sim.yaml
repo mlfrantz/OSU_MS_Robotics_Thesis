@@ -2,8 +2,8 @@
 sim_period: 30
 
 # ROMS File to use for simulation
-roms_file: "roms/txla_hindcast_jun_1_2011.nc"
-# roms_file: 'roms/txla_hindcast_agg_galveston_zone_2.nc' # This is a smaller test file
+# roms_file: "roms/txla_hindcast_jun_1_2011.nc"
+roms_file: 'roms/txla_hindcast_agg_galveston_zone_2.nc' # This is a smaller test file
 
 # Obstacles
 generate_dynamic_obstacles: True

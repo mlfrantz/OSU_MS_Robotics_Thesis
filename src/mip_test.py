@@ -162,26 +162,29 @@ def main():
     robots = range(len(args.robots))
 
     # Problem data, matrix transposed to allow for proper x,y coordinates to be mapped wih i,j
-    # field = np.genfromtxt(args.infile_path, delimiter=',', dtype=float).transpose()
+    field = np.genfromtxt(args.infile_path, delimiter=',', dtype=float).transpose()
 
-    # Loading Simulation-Specific Parameters
-    with open(os.path.expandvars(args.sim_cfg),'rb') as f:
-        yaml_sim = yaml.load(f.read())
-
-    wd = World.roms(
-        datafile_path=yaml_sim['roms_file'],
-        xlen        = yaml_sim['sim_world']['width'],
-        ylen        = yaml_sim['sim_world']['height'],
-        center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
-        feature     = yaml_sim['science_variable'],
-        resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
-        )
-
-    # This is the scalar_field in a static word.
-    # The '0' is the first time step and goes up to some max time
-    field = wd.scalar_field[:,:,0]
-
-    field_resolution = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution'])
+    # # Loading Simulation-Specific Parameters
+    # with open(os.path.expandvars(args.sim_cfg),'rb') as f:
+    #     yaml_sim = yaml.load(f.read())
+    #
+    # wd = World.roms(
+    #     datafile_path=yaml_sim['roms_file'],
+    #     xlen        = yaml_sim['sim_world']['width'],
+    #     ylen        = yaml_sim['sim_world']['height'],
+    #     center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
+    #     feature     = yaml_sim['science_variable'],
+    #     resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
+    #     )
+    #
+    # # This is the scalar_field in a static word.
+    # # The '0' is the first time step and goes up to some max time
+    # field = wd.scalar_field[:,:,0]
+    #
+    # # Example of an obstacle, make the value very low in desired area
+    # field[int(len(field)/4):int(3*len(field)/4),int(len(field)/4):int(3*len(field)/4)] = -100
+    #
+    # field_resolution = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution'])
 
     if args.gradient:
         grad_field = np.gradient(field)
@@ -339,30 +342,28 @@ def main():
         # Now we need to correct our previous velocity_correction by making sure the edges are the lengths of the edges are all equal.
         path_len_x = args.straight_line[0]
         path_len_y = args.straight_line[1]
+        delta = 4 #max(path_len_x,path_len_y)
+        M = 1000
         for r in robots:
             for v in velocity_correction:
                 inv_v = 1/v
                 if inv_v > 1:
-                    delta = int(inv_v)+1
-                    M = 1000
                     tv = m.addVars(steps[r][delta:], range(4), vtype=GRB.BINARY, name='t1')
                     for t in steps[r][delta:]:
-                        m.addConstr(x[r,t-delta] - x[r,t] >= delta*v - M*tv[t,0] )
-                        m.addConstr(x[r,t] - x[r,t-delta] >= delta*v - M*tv[t,1] )
-                        m.addConstr(y[r,t-delta] - y[r,t] >= delta*v - M*tv[t,2] )
-                        m.addConstr(y[r,t] - y[r,t-delta] >= delta*v - M*tv[t,3] )
+                        m.addConstr(x[r,t-delta] - x[r,t] >= path_len_x*v - M*tv[t,0] )
+                        m.addConstr(x[r,t] - x[r,t-delta] >= path_len_x*v - M*tv[t,1] )
+                        m.addConstr(y[r,t-delta] - y[r,t] >= path_len_y*v - M*tv[t,2] )
+                        m.addConstr(y[r,t] - y[r,t-delta] >= path_len_y*v - M*tv[t,3] )
                         m.addConstr(tv[t,0] + tv[t,1] + tv[t,2] + tv[t,3] <= 3 )
                 else:
                     # Working better
-                    delta = 4
-                    M = 1000
                     ts = m.addVars(steps[r][delta:], range(4), vtype=GRB.BINARY, name='ts')
                     for t in steps[r][delta:]:
                         m.addConstr(x[r,t-delta] - x[r,t] >= path_len_x - M*ts[t,0])
                         m.addConstr(x[r,t] - x[r,t-delta] >= path_len_x - M*ts[t,1])
                         m.addConstr(y[r,t-delta] - y[r,t] >= path_len_y - M*ts[t,2])
                         m.addConstr(y[r,t] - y[r,t-delta] >= path_len_y - M*ts[t,3])
-                        m.addConstr(ts[t,0] + ts[t,1] + ts[t,2] + ts[t,3] <= 3)
+                        m.addConstr(ts[t,0] + ts[t,1] + ts[t,2] + ts[t,3] <= 3 )
 
     # Area Constraint (Start with square, expand to more complex shapes)
     if len(args.rect_area) > 0:
