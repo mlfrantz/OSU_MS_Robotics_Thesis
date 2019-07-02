@@ -1,12 +1,60 @@
 Test I want to run
 what constraints I want (4 or 5)?
+	Directionality constraints
+	Forced curl constraints
+	Straight Line contraints
+	Not going over the same spot twice
+	Heterogenous teams of robots with different velocities
+	
+	Need to implement:
+		Sychronization Constraint
+		Obstacle avoidance?
+		
+
 What enviroments do I want to test in?
 	Some systematic events?
 		fake symettries? make sure it behaves systematically?
-	ROMS data?
+			It should but easy to check
+
+	ROMS data: Working but need to fix scaling everything by the map resolution,
+		Currently inputting via an array position, should change to x,y or lat,lon position
+
+	Could possibly look at time varying envornments?
+	
+
 Which comparisons do I want to do?
 	Other algorithms?
+		RIG?
+		Greedy?
+	MCTS graph search?
+	Other graph search algorithms?
+
 Outline for my report
 	What do I want to include
+		Background
+		Basic Structure
+		My contraints
+		Comparisons? :
+		Time requirements
+			Budget growth for single robot
+			Number of constraints for fixed budget
+			adding more robots
+			
+
 	What is in/out of scope?
+		Heterogenous teams possibly out of scope but interesting
+
+		
+
 Timeline 
+
+April: 	Init Gurobi: Done
+		Lit Review: Kind of done, need more
+May:	Implement one constraint in ROMS
+			Kind of done, need to fix scaling issues
+June:	Additional Constraints
+July:	Computation/perfomance trials complete
+Aug:	Presentation/writeup, final simulations
+Sept:	Defend
+			Julie rogered up, no dates yet, should be
+			Tumar: no reply as of 27 June
