@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, pdb, time, argparse
+import sys, pdb, time, argparse, os
 import oyaml as yaml
 import numpy as np
 import matplotlib.pyplot as plt
@@ -336,8 +336,7 @@ def main():
                     m.addConstr(y[r,s]-y[r,t] >= 0.1 - M*t1[j,3])
                     m.addConstr(t1[j,0] + t1[j,1] + t1[j,2] + t1[j,3] <= 3)
 
-    # Synchronization Constraint: Specific path or 8 direction? [NS, EW, NE-SW, NW-SE]
-
+    # Synchronization Constraint: Specific path or 8 direction [NS, EW, NE-SW, NW-SE]
     if args.sync == 'ns':
         for r in robots:
             v = velocity_correction[r]
