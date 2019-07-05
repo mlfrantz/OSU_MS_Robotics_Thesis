@@ -224,8 +224,6 @@ def main():
 
         path.append([path[-1][0] + directions[np.argmax(values)][0], path[-1][1] + directions[np.argmax(values)][1]])
 
-    print(path)
-
     if args.gen_image:
         # Plotting Code
         path_x = [p[0] for p in path]
