@@ -1,0 +1,4 @@
+Experiment,Algorithm,Map,Map Center,Map Resolution,Start Point,End Point,Score,Run Time (sec),Budget (hours),Number of Robots,Constraints
+Test Experiment,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[10, 6]",NA,4.201087834794884,0.018594026565551758,3.0,1,
+Test Experiment,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[10, 6]",NA,4.201087834794884,0.021029949188232422,3.0,1,
+Test Experiment,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[10, 6]",NA,4.201087834794884,0.014841079711914062,3.0,1,_nsew

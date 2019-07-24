@@ -1,11 +1,18 @@
-#!/usr/bin/python
+#!/home/mlfrantz/miniconda2/bin/python3.6
 
-import sys, pdb, time, argparse, os
+import sys, pdb, time, argparse, os, csv
 import oyaml as yaml
 import numpy as np
 import matplotlib.pyplot as plt
 from gurobipy import *
 from sas_utils import World, Location
+
+def normalize(data, index=0):
+    # This function scales the data between 0-1. the 'index' variable is to select
+    # a specific time frame to normalize to.
+    x_min = np.min(data[:,:,index])
+    x_max = np.max(data[:,:,index])
+    return (data - x_min) / (x_max - x_min)
 
 def main():
 
@@ -147,6 +154,13 @@ def main():
         action='store_true',
         help='Will load ROMS maps by default, otherwise loads a test map.',
         )
+    parser.add_argument(
+        '--experiment_name',
+        nargs='?',
+        type=str,
+        default="Test Experiment",
+        help='Name of the Experiement you are running',
+        )
 
     args = parser.parse_args()
 
@@ -173,6 +187,10 @@ def main():
         # The '0' is the first time step and goes up to some max time
         # field = np.copy(wd.scalar_field[:,:,0])
         field = np.copy(wd.scalar_field)
+
+        norm_field = normalize(field)
+        field = normalize(field) # This will normailze the field between 0-1
+
 
         # Example of an obstacle, make the value very low in desired area
         # field[int(len(field)/4):int(3*len(field)/4),int(len(field)/4):int(3*len(field)/4)] = -100
@@ -513,12 +531,12 @@ def main():
                 plt.imshow(field.transpose(), interpolation='gaussian', cmap= 'gnuplot')
         else:
             if not args.test:
-                plt.imshow(wd.scalar_field[:,:,0].transpose(), interpolation='gaussian', cmap= 'gnuplot')
+                plt.imshow(norm_field[:,:,0].transpose(), interpolation='gaussian', cmap= 'gnuplot')
                 plt.xticks(np.arange(0,len(wd.lon_ticks), (1/min(field_resolution))), np.around(wd.lon_ticks[0::int(1/min(field_resolution))], 2))
                 plt.yticks(np.arange(0,len(wd.lat_ticks), (1/min(field_resolution))), np.around(wd.lat_ticks[0::int(1/min(field_resolution))], 2))
                 plt.xlabel('Longitude', fontsize=20)
                 plt.ylabel('Latitude', fontsize=20)
-                plt.text(1.25, 0.5, str(yaml_sim['science_variable']),{'fontsize':20}, horizontalalignment='left', verticalalignment='center', rotation=90, clip_on=False, transform=plt.gca().transAxes)
+                plt.text(1.25, 0.5, "normalized " + str(yaml_sim['science_variable']),{'fontsize':20}, horizontalalignment='left', verticalalignment='center', rotation=90, clip_on=False, transform=plt.gca().transAxes)
             else:
                 plt.imshow(field.transpose(), interpolation='gaussian', cmap= 'gnuplot')
 
@@ -609,6 +627,85 @@ def main():
         print(file_string)
         plt.savefig(args.outfile_path + file_string)
         plt.show()
+    else:
+        filename = args.outfile_path
+        check_empty = os.path.exists(filename)
+
+        if args.direction_constr == 'nsew':
+            dir_str = '_%s' % args.direction_constr
+        elif args.direction_constr == 'diag':
+            dir_str = '_%s' % args.direction_constr
+        else:
+            dir_str = ''
+
+        if args.collision_rad > 0:
+            collision_str = '_collRad_%d' % args.collision_rad
+        else:
+            collision_str = ''
+
+        if args.anti_curl:
+            anti_curl_str = '_antiCurl'
+        else:
+            anti_curl_str = ''
+
+        if args.force_curl:
+            force_curl_str = '_forceCurl'
+        else:
+            force_curl_str = ''
+
+        if len(args.straight_line) > 0:
+            straight_line_str = '_straight_%d_%d' % (args.straight_line[0], args.straight_line[1])
+        else:
+            straight_line_str = ''
+
+        if len(args.rect_area) > 0:
+            area = args.rect_area
+            rect_area_str = '_rect_x%d_%dy%d_%d' % (area[0], area[1], area[2], area[3])
+        else:
+            rect_area_str = ''
+
+        constraint_string = collision_str + \
+                            dir_str + anti_curl_str + \
+                            force_curl_str + \
+                            straight_line_str + \
+                            rect_area_str
+
+        obj = m.getObjective()
+        score_str = obj.getValue()
+
+        with open(filename, 'a', newline='') as csvfile:
+            fieldnames = [  'Experiment', \
+                            'Algorithm', \
+                            'Map', \
+                            'Map Center', \
+                            'Map Resolution', \
+                            'Start Point', \
+                            'End Point', \
+                            'Score', \
+                            'Run Time (sec)', \
+                            'Budget (hours)', \
+                            'Number of Robots', \
+                            'Constraints']
+
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            if not check_empty:
+                print("File is empty")
+                writer.writeheader()
+
+            writer.writerow({   'Experiment': args.experiment_name, \
+                                'Algorithm': 'MIP', \
+                                'Map': str(yaml_sim['roms_file']), \
+                                'Map Center': Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']).__str__(), \
+                                'Map Resolution': (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']), \
+                                'Start Point': args.start_point, \
+                                'End Point': args.end_point if len(args.end_point) > 0 else 'NA' , \
+                                'Score': score_str, \
+                                'Run Time (sec)': m.Runtime, \
+                                'Budget (hours)': args.planning_time, \
+                                'Number of Robots': len(args.robots), \
+                                'Constraints': constraint_string})
+
+
 
 if __name__ == '__main__':
     main()

@@ -24,24 +24,26 @@ class GameState:
         By convention the players are numbered 1 and 2.
     """
     def __init__(self, field, start, position, budget, path, end = None, direction_constr = None):
-            self.field = field # Scalar field
-            self.pos = start # Position of robot, starts at the start imagine that
-            self.end = end # Ending position
-            self.budget = budget # How many hours are we planning for
-            self.path = [path]
+        self.field = field # Scalar field
+        self.pos = start # Position of robot, starts at the start imagine that
+        self.end = end # Ending position
+        self.budget = budget # How many hours are we planning for / or number of steps?
+        self.budget_remaining = budget
+        self.path = [path]
 
-            # Build the direction vectors for checking values
-            if direction_constr == 'None':
-                # Check each of the 8 directions (N,S,E,W,NE,NW,SE,SW)
-                self.directions = [(0,1), (0,-1), (1,0), (-1,0), (1,1), (-1,1), (1,-1), (-1,-1)]
-            elif direction_constr == 'nsew':
-                self.directions = [(0,1), (0,-1), (1,0), (-1,0)] # N-S-E-W
-            elif direction_constr == 'diag':
-                self.directions = [(1,1), (-1,1), (1,-1), (-1,-1)] # Diag
+        # Build the direction vectors for checking values
+        self.dir_contr = direction_constr
+        if self.dir_contr == 'None':
+            # Check each of the 8 directions (N,S,E,W,NE,NW,SE,SW)
+            self.directions = [(0,1), (0,-1), (1,0), (-1,0), (1,1), (-1,1), (1,-1), (-1,-1)]
+        elif self.dir_contr == 'nsew':
+            self.directions = [(0,1), (0,-1), (1,0), (-1,0)] # N-S-E-W
+        elif self.dir_contr == 'diag':
+            self.directions = [(1,1), (-1,1), (1,-1), (-1,-1)] # Diag
 
     def Clone(self):
         """ Create a deep clone of this game state."""
-        st = GameState(self.field, self.pos, self.budget, self.end, self.path, direction_constr=self.directions)
+        st = GameState(self.field, self.pos, self.budget, self.end, self.path, direction_constr=self.dir_contr)
         return st
 
     def DoMove(self, move):
@@ -52,23 +54,44 @@ class GameState:
 
     def GetMoves(self):
         """ Get all possible moves from this state."""
+        # moves = []
+        # next_int = self.pos
+        # if next_int == self.goal:
+        #     return []
+        # else:
+        #     #For our case the car can either go East, North, or South
+        #     if next_int[0] + 1 < self.grid_size: #can move east
+        #         moves.append((next_int[0]+1, next_int[1]))
+        #     if next_int[1] + 1  < self.grid_size:# and (next_int[1] + 1 != self.last_pos[1]): #can move north
+        #         moves.append((next_int[0], next_int[1]+1))
+        #     if next_int[1] - 1  >= 0:# and (next_int[1] - 1 != self.last_pos[1]): #can move south
+        #         moves.append((next_int[0], next_int[1]-1))
+        #     for move in moves:
+        #         if move == self.goal:
+        #             return [self.goal]
+        #         else:
+        #             return moves
+
+
+        # Check each of the directions
         moves = []
-        next_int = self.pos
-        if next_int == self.goal:
-            return []
-        else:
-            #For our case the car can either go East, North, or South
-            if next_int[0] + 1 < self.grid_size: #can move east
-                moves.append((next_int[0]+1, next_int[1]))
-            if next_int[1] + 1  < self.grid_size:# and (next_int[1] + 1 != self.last_pos[1]): #can move north
-                moves.append((next_int[0], next_int[1]+1))
-            if next_int[1] - 1  >= 0:# and (next_int[1] - 1 != self.last_pos[1]): #can move south
-                moves.append((next_int[0], next_int[1]-1))
-            for move in moves:
-                if move == self.goal:
-                    return [self.goal]
+
+        if len(self.path) >= self.budget: # If this path has exceeded our budget then we have no more moves
+            return moves
+
+        for i,d in enumerate(self.directions):
+            try:
+                # if args.same_point:
+                if [self.path[-1][0] + d[0], self.path[-1][1] + d[1]] not in path:
+                    moves.append(self.field[self.path[-1][0] + d[0], self.path[-1][1] + d[1], 0])
                 else:
-                    return moves
+                    continue
+                # else:
+                #     values[i] = self.field[self.path[-1][0] + d[0], self.path[-1][1] + d[1], 0]
+            except:
+                continue
+
+        return moves
 
     def GetResult(self, move):
         #if move is to the goal, end the rollout
@@ -90,9 +113,7 @@ class GameState:
         return s
 
 class Node:
-    """ A node in the game tree. Note wins is always from the viewpoint of playerJustMoved.
-        Crashes if state not specified.
-    """
+    """ A node in the game tree. Note wins is always from the viewpoint of playerJustMoved."""
     def __init__(self, move = None, parent = None, state = None):
         self.move = move # the move that got us to this node - "None" for the root node
         self.parentNode = parent # "None" for the root node
