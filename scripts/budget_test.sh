@@ -7,11 +7,11 @@ outfile_path='/home/mlfrantz/Documents/MIP_Research/mip_research/data/budget_tes
 experiment_name='Budget_Test'
 
 # These will lopp through the 9 starting points for each map
-# xPoints='1 5 9'
-xPoints-'9'
+xPoints='1 5 9'
 yPoints='1 5 9'
 
-budget='1 2 4 8 10 12'
+# budget='1 2 4 8 10 12'
+budget='10 12'
 
 for b in $budget
 do
