@@ -191,7 +191,6 @@ def main():
         norm_field = normalize(field)
         field = normalize(field) # This will normailze the field between 0-1
 
-
         # Example of an obstacle, make the value very low in desired area
         # field[int(len(field)/4):int(3*len(field)/4),int(len(field)/4):int(3*len(field)/4)] = -100
 
@@ -313,8 +312,8 @@ def main():
     if args.gradient:
         m.addConstrs((quicksum(mag_grad_field[i,j]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
     else:
-        m.addConstrs((quicksum(field[i,j,field_time_steps[t]]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
-
+        # m.addConstrs((quicksum(field[i,j,field_time_steps[t]]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
+        m.addConstrs((quicksum(field[i,j,0]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
     # Primary Motion constraints
     # Binary variables for motion constraints
     b_range = range(4)
@@ -608,7 +607,7 @@ def main():
             rect_area_str = ''
 
         obj = m.getObjective()
-        score_str = '_score_%d' % obj.getValue()
+        score_str = '_score_%f' % obj.getValue()
 
         file_string = 'mip_run_' + time.strftime("%Y%m%d-%H%M%S") + \
                                                                     robots_str + \

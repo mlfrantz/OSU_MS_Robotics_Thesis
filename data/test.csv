@@ -2,3 +2,6 @@ Experiment,Algorithm,Map,Map Center,Map Resolution,Start Point,End Point,Score,R
 Test Experiment,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[10, 6]",NA,4.201087834794884,0.018594026565551758,3.0,1,
 Test Experiment,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[10, 6]",NA,4.201087834794884,0.021029949188232422,3.0,1,
 Test Experiment,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[10, 6]",NA,4.201087834794884,0.014841079711914062,3.0,1,_nsew
+Budget_Test,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1]",NA,0.3051015938937992,2.7894973754882812e-05,1.0,1,
+Budget_Test,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 5]",NA,1.1855356942865338,7.677078247070312e-05,1.0,1,
+Budget_Test,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1]",NA,0.18941659311894143,0.025807857513427734,1.0,1,
