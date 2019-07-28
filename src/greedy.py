@@ -223,40 +223,33 @@ def main():
 
     startTime = time.time()
 
-    for s in steps[0]:
-        # Check each of the directions
-        if s == 0:
-            path = start
-            continue
-        values = np.zeros(len(directions))
-        for i,d in enumerate(directions):
-            try:
-                if args.same_point:
-                    if [path[-1][0] + d[0], path[-1][1] + d[1]] not in path:
-                        values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
-                    else:
-                        continue
-                else:
-                    values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
-            except:
-                continue
 
-        path.append([path[-1][0] + directions[np.argmax(values)][0], path[-1][1] + directions[np.argmax(values)][1]])
+    paths = []
+    for r in robots:
+        for s in steps[r]:
+            # Check each of the directions
+            if s == 0:
+                path = [start[r]]
+                continue
+            values = np.zeros(len(directions))
+            for i,d in enumerate(directions):
+                try:
+                    if args.same_point:
+                        if [path[-1][0] + d[0], path[-1][1] + d[1]] not in path:
+                            values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
+                        else:
+                            continue
+                    else:
+                        values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
+                except:
+                    continue
+
+            path.append([path[-1][0] + directions[np.argmax(values)][0], path[-1][1] + directions[np.argmax(values)][1]])
+        paths.append(path)
 
     runTime = time.time() - startTime
-    print(path)
-    if args.gen_image:
-        # Plotting Code
-        path_x = [p[0] for p in path]
-        path_y = [p[1] for p in path]
-        # print('Obj: %g' % obj.getValue())
-        _paths = list(zip(path_x, path_y))
-        paths = []
-        for r in robots:
-            paths.append(_paths[0:len(steps[r])])
-            _paths = _paths[len(steps[r]):]
 
-        print(paths)
+    if args.gen_image:
 
         if args.gradient:
             # plt.imshow(mag_grad_field.transpose())#, interpolation='gaussian', cmap= 'gnuplot')
@@ -323,7 +316,6 @@ def main():
 
         print(sum([field[p[0],p[1],0] for p in path]))
         score_str = '_score_%f' % sum([field[p[0],p[1],0] for p in path])
-        pdb.set_trace()
 
         file_string = 'greedy_' + time.strftime("%Y%m%d-%H%M%S") + \
                                                                     robots_str + \
@@ -351,6 +343,7 @@ def main():
 
         constraint_string = dir_str
 
+        # Probably will need to update this
         score_str = sum([field[p[0],p[1],0] for p in path])
 
         with open(filename, 'a', newline='') as csvfile:

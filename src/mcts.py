@@ -458,26 +458,6 @@ def main():
 
     startTime = time.time()
 
-    # for s in steps[0]:
-    #     # Check each of the directions
-    #     if s == 0:
-    #         path = start
-    #         continue
-    #     values = np.zeros(len(directions))
-    #     for i,d in enumerate(directions):
-    #         try:
-    #             if args.same_point:
-    #                 if [path[-1][0] + d[0], path[-1][1] + d[1]] not in path:
-    #                     values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
-    #                 else:
-    #                     continue
-    #             else:
-    #                 values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
-    #         except:
-    #             continue
-    #
-    #     path.append([path[-1][0] + directions[np.argmax(values)][0], path[-1][1] + directions[np.argmax(values)][1]])
-
     path = UCTPlayGame(field, start, len(steps[0]), None, args.direction_constr)
 
     runTime = time.time() - startTime
