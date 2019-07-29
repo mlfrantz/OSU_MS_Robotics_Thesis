@@ -21,11 +21,79 @@ import matplotlib.pyplot as plt
 from sas_utils import World, Location
 
 def normalize(data, index=0):
+
     # This function scales the data between 0-1. the 'index' variable is to select
     # a specific time frame to normalize to.
     x_min = np.min(data[:,:,index])
     x_max = np.max(data[:,:,index])
     return (data - x_min) / (x_max - x_min)
+
+def bilinear_interpolation(point, field):
+        # Solution courtesy of Raymond Hettinger
+        # https://stackoverflow.com/questions/8661537/how-to-perform-bilinear-interpolation-in-python
+    '''Interpolate (x,y) from point values associated with four points.
+
+    The four points are a list of four triplets:  (x, y, value).
+    The four points can be in any order.  They should form a rectangle.
+
+        >>> bilinear_interpolation(12, 5.5,
+        ...                        [(10, 4, 100),
+        ...                         (20, 4, 200),
+        ...                         (10, 6, 150),
+        ...                         (20, 6, 300)])
+        165.0
+
+    '''
+    # See formula at:  http://en.wikipedia.org/wiki/Bilinear_interpolation
+
+    x = point[0]
+    y = point[1]
+
+    points = sorted(corners(point,field))               # order points by x, then by y
+    (x1, y1, q11), (_x1, y2, q12), (x2, _y1, q21), (_x2, _y2, q22) = points
+
+    if x1 != _x1 or x2 != _x2 or y1 != _y1 or y2 != _y2:
+        raise ValueError('points do not form a rectangle')
+    if not x1 <= x <= x2 or not y1 <= y <= y2:
+        raise ValueError('(x, y) not within the rectangle')
+
+    return (q11 * (x2 - x) * (y2 - y) +
+            q21 * (x - x1) * (y2 - y) +
+            q12 * (x2 - x) * (y - y1) +
+            q22 * (x - x1) * (y - y1)
+           ) / ((x2 - x1) * (y2 - y1) + 0.0)
+
+def corners(point,field):
+    corners = []
+
+    pointX = point[0]
+    pointY = point[1]
+
+    for p in [pointX, pointY]:
+        if float(p) % 1 != 0.0:
+            # Means point is not an integer
+            upper = np.ceil(p)
+            lower = np.floor(p)
+        else:
+            if float(p) == 0.0:
+                lower = p
+                upper = 1
+            elif p == field.shape[0]-1:
+                upper = field.shape[0]-1
+                lower = upper - 1
+            else:
+                upper = p
+                lower = p + 1
+        corners.append(int(lower))
+        corners.append(int(upper))
+    try:
+        corners = [ (corners[0], corners[2], field[corners[0], corners[2], 0]), \
+                    (corners[0], corners[3], field[corners[0], corners[3], 0]), \
+                    (corners[1], corners[2], field[corners[1], corners[2], 0]), \
+                    (corners[1], corners[3], field[corners[1], corners[3], 0])]
+    except:
+        pdb.set_trace()
+    return corners
 
 class GameState:
     """ A state of the game, i.e. the game board. These are the only functions which are
@@ -34,12 +102,13 @@ class GameState:
         GetRandomMove() function to generate a random move during rollout.
         By convention the players are numbered 1 and 2.
     """
-    def __init__(self, field, position, budget, path, end = None, direction_constr = '8_direction'):
+    def __init__(self, field, position, budget, path, velocity_correction = 1, end = None, direction_constr = '8_direction'):
         self.field = field # Scalar field
         self.pos = position # Position of robot, starts at the start imagine that
         self.end = end # Ending position
         self.budget = budget # How many hours are we planning for / or number of steps?
         self.path = path
+        self.vel = velocity_correction
 
         # Build the direction vectors for checking values
         self.dir_contr = direction_constr
@@ -53,7 +122,7 @@ class GameState:
 
     def Clone(self):
         """ Create a deep clone of this game state."""
-        st = GameState(self.field, self.pos, self.budget, self.path, self.end, direction_constr=self.dir_contr)
+        st = GameState(self.field, self.pos, self.budget, self.path, self.vel, self.end, direction_constr=self.dir_contr)
         return st
 
     def DoMove(self, move):
@@ -72,23 +141,6 @@ class GameState:
 
     def GetMoves(self):
         """ Get all possible moves from this state."""
-        # moves = []
-        # next_int = self.pos
-        # if next_int == self.goal:
-        #     return []
-        # else:
-        #     #For our case the car can either go East, North, or South
-        #     if next_int[0] + 1 < self.grid_size: #can move east
-        #         moves.append((next_int[0]+1, next_int[1]))
-        #     if next_int[1] + 1  < self.grid_size:# and (next_int[1] + 1 != self.last_pos[1]): #can move north
-        #         moves.append((next_int[0], next_int[1]+1))
-        #     if next_int[1] - 1  >= 0:# and (next_int[1] - 1 != self.last_pos[1]): #can move south
-        #         moves.append((next_int[0], next_int[1]-1))
-        #     for move in moves:
-        #         if move == self.goal:
-        #             return [self.goal]
-        #         else:
-        #             return moves
 
         # Check each of the directions
         moves = []
@@ -105,12 +157,13 @@ class GameState:
             # if args.same_point:
             # Checks if next point has already been visited, if not, then add move
             try:
-                move = [int(self.pos[0][0]) + int(d[0]), int(self.pos[0][1]) + int(d[1])]
+                move = [float(self.pos[0][0]) + self.vel*int(d[0]), float(self.pos[0][1]) + self.vel*int(d[1])]
             except TypeError:
-                move =  [int(self.pos[0]) + int(d[0]), int(self.pos[1]) + int(d[1])]
+                move =  [float(self.pos[0]) + self.vel*int(d[0]), float(self.pos[1]) + self.vel*int(d[1])]
 
             # print(move[0], move[1])
-            if move not in self.path:
+            # if move not in self.path:
+            if [round(move[0],3),round(move[1],3)] not in [[round(p[0],3),round(p[1],3)] for p in self.path]:
                 # print("Move not in Path")
                 # pdb.set_trace()
                 if move[0] < 0 or move[0] >= self.field.shape[0] or move[1] < 0 or move[1] >= self.field.shape[1]:
@@ -135,7 +188,8 @@ class GameState:
         #     return self.field[move[0],move[1],0]#sum([self.field[p[0],p[1],0] for p in temp_path])
         # else:
         #     return 0.0
-        return self.field[int(move[0][0]), int(move[0][1]), 0]
+        #return self.field[int(move[0][0]), int(move[0][1]), 0]
+        return bilinear_interpolation(move[0], self.field)
 
     def GetRandomMove(self):
         move = random.choice(self.GetMoves())
@@ -241,17 +295,17 @@ def UCT(rootstate, itermax, verbose = False):
     # return sorted(rootnode.childNodes, key = lambda c: c.wins)[-1].move # return the move that has the highest wins
     return sorted(rootnode.childNodes, key = lambda c: c.visits)[-1].move # return the move that has the most visits
 
-def UCTPlayGame(field, start, budget, end=None, direction_constr='8_direction'):
+def UCTPlayGame(field, start, budget, velocity_correction=1, end=None, direction_constr='8_direction'):
     """ Play a sample game between two UCT players where each player gets a different number
         of UCT iterations (= simulations = tree nodes).
     """
 
-    state = GameState(field, start, budget, start, end, direction_constr)
+    state = GameState(field, start, budget, start, velocity_correction, end, direction_constr)
     return_path = start
     # print(state.GetMoves())
     while (state.GetMoves() != []):
         # print(str(state))
-        m = UCT(rootstate = state, itermax = 8*budget*100, verbose = False) # play with values for itermax and verbose = True
+        m = UCT(rootstate = state, itermax = 100000, verbose = False) # play with values for itermax and verbose = True
         # print("Best Move: " + str(m) + "\n")
         state.DoMove(m)
         state.path = state.path[:] + [m]
@@ -458,21 +512,14 @@ def main():
 
     startTime = time.time()
 
-    path = UCTPlayGame(field, start, len(steps[0]), None, args.direction_constr)
+    paths = []
+    for r in robots:
+        paths.append(UCTPlayGame(field, [start[r]], len(steps[r]), velocity_correction[r], None, args.direction_constr))
 
     runTime = time.time() - startTime
 
-    print(path)
     if args.gen_image:
-        # Plotting Code
-        path_x = [p[0] for p in path]
-        path_y = [p[1] for p in path]
-        # print('Obj: %g' % obj.getValue())
-        _paths = list(zip(path_x, path_y))
-        paths = []
-        for r in robots:
-            paths.append(_paths[0:len(steps[r])])
-            _paths = _paths[len(steps[r]):]
+        # # Plotting Code
 
         print(paths)
 
@@ -539,8 +586,9 @@ def main():
         else:
             dir_str = ''
 
-        print(sum([field[p[0],p[1],0] for p in path]))
-        score_str = '_score_%f' % sum([field[p[0],p[1],0] for p in path])
+        # print(sum([field[p[0],p[1],0] for p in path]))
+        # print(sum([bilinear_interpolation(p, field) for p in path for path in paths]))
+        score_str = '_score_%f' % sum([bilinear_interpolation(p, field) for path in paths for p in path])
 
 
         file_string = 'mcts_' + time.strftime("%Y%m%d-%H%M%S") + \
@@ -569,7 +617,8 @@ def main():
 
         constraint_string = dir_str
 
-        score_str = sum([field[p[0],p[1],0] for p in path])
+        # score_str = sum([field[p[0],p[1],0] for p in path])
+        score_str = sum([bilinear_interpolation(p, field) for path in paths for p in path])
 
         with open(filename, 'a', newline='') as csvfile:
             fieldnames = [  'Experiment', \

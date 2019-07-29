@@ -15,6 +15,73 @@ def normalize(data, index=0):
     x_max = np.max(data[:,:,index])
     return (data - x_min) / (x_max - x_min)
 
+def bilinear_interpolation(point, field):
+        # Solution courtesy of Raymond Hettinger
+        # https://stackoverflow.com/questions/8661537/how-to-perform-bilinear-interpolation-in-python
+    '''Interpolate (x,y) from point values associated with four points.
+
+    The four points are a list of four triplets:  (x, y, value).
+    The four points can be in any order.  They should form a rectangle.
+
+        >>> bilinear_interpolation(12, 5.5,
+        ...                        [(10, 4, 100),
+        ...                         (20, 4, 200),
+        ...                         (10, 6, 150),
+        ...                         (20, 6, 300)])
+        165.0
+
+    '''
+    # See formula at:  http://en.wikipedia.org/wiki/Bilinear_interpolation
+
+    x = point[0]
+    y = point[1]
+
+    points = sorted(corners(point,field))               # order points by x, then by y
+    (x1, y1, q11), (_x1, y2, q12), (x2, _y1, q21), (_x2, _y2, q22) = points
+
+    if x1 != _x1 or x2 != _x2 or y1 != _y1 or y2 != _y2:
+        raise ValueError('points do not form a rectangle')
+    if not x1 <= x <= x2 or not y1 <= y <= y2:
+        raise ValueError('(x, y) not within the rectangle')
+
+    return (q11 * (x2 - x) * (y2 - y) +
+            q21 * (x - x1) * (y2 - y) +
+            q12 * (x2 - x) * (y - y1) +
+            q22 * (x - x1) * (y - y1)
+           ) / ((x2 - x1) * (y2 - y1) + 0.0)
+
+def corners(point,field):
+    corners = []
+
+    pointX = point[0]
+    pointY = point[1]
+
+    for p in [pointX, pointY]:
+        if float(p) % 1 != 0.0:
+            # Means point is not an integer
+            upper = np.ceil(p)
+            lower = np.floor(p)
+        else:
+            if float(p) == 0.0:
+                lower = p
+                upper = 1
+            elif p == field.shape[0]-1:
+                upper = field.shape[0]-1
+                lower = upper - 1
+            else:
+                upper = p
+                lower = p + 1
+        corners.append(int(lower))
+        corners.append(int(upper))
+    try:
+        corners = [ (corners[0], corners[2], field[corners[0], corners[2], 0]), \
+                    (corners[0], corners[3], field[corners[0], corners[3], 0]), \
+                    (corners[1], corners[2], field[corners[1], corners[2], 0]), \
+                    (corners[1], corners[3], field[corners[1], corners[3], 0])]
+    except:
+        pdb.set_trace()
+    return corners
+
 def main():
 
     parser = argparse.ArgumentParser(description='Parser for MIP testing')
@@ -232,21 +299,38 @@ def main():
                 path = [start[r]]
                 continue
             values = np.zeros(len(directions))
+
             for i,d in enumerate(directions):
+                # print(path[-1])
                 try:
                     if args.same_point:
-                        if [path[-1][0] + d[0], path[-1][1] + d[1]] not in path:
-                            values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
+                        move = [path[-1][0] + velocity_correction[r]*d[0], path[-1][1] + velocity_correction[r]*d[1]]
+                        if move[0] >= 0 and move[0] < field.shape[0] and move[1] >= 0 and move[1] < field.shape[1]:
+                            # print(move,move[0], move[1],move[0] >= 0 and move[0] < field.shape[0] and move[1] >= 0 and move[1] < field.shape[1])
+                            # Makes sure we are in
+                            if [round(move[0],3),round(move[1],3)] not in [[round(p[0],3),round(p[1],3)] for p in path]:
+                                # print(path,move)
+                                # print("Not in path", path)
+                                values[i] = bilinear_interpolation(move, field)
+                                # values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
+                            else:
+                                continue
                         else:
+                            # print(move[0], move[1],move[0] >= 0 and move[0] < field.shape[0] and move[1] >= 0 and move[1] < field.shape[1])
+                            # Makes sure we are in
                             continue
                     else:
-                        values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
+                        # values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
+                        # print("Same point allowed")
+                        values[i] = bilinear_interpolation(move, field)
                 except:
                     continue
-
-            path.append([path[-1][0] + directions[np.argmax(values)][0], path[-1][1] + directions[np.argmax(values)][1]])
+            # print(values)
+            new_point = [path[-1][0] + velocity_correction[r]*directions[np.argmax(values)][0], path[-1][1] + velocity_correction[r]*directions[np.argmax(values)][1]]
+            # print(new_point, values, np.argmax(values), directions[np.argmax(values)])
+            path.append(new_point)
         paths.append(path)
-
+    # print(paths)
     runTime = time.time() - startTime
 
     if args.gen_image:
@@ -314,8 +398,8 @@ def main():
         else:
             dir_str = ''
 
-        print(sum([field[p[0],p[1],0] for p in path]))
-        score_str = '_score_%f' % sum([field[p[0],p[1],0] for p in path])
+        # print(sum([field[p[0],p[1],0] for p in path]))
+        score_str = '_score_%f' % sum([bilinear_interpolation(p, field) for path in paths for p in path])
 
         file_string = 'greedy_' + time.strftime("%Y%m%d-%H%M%S") + \
                                                                     robots_str + \
@@ -344,7 +428,7 @@ def main():
         constraint_string = dir_str
 
         # Probably will need to update this
-        score_str = sum([field[p[0],p[1],0] for p in path])
+        score_str = sum([bilinear_interpolation(p, field) for path in paths for p in path])
 
         with open(filename, 'a', newline='') as csvfile:
             fieldnames = [  'Experiment', \

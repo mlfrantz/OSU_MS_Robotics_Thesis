@@ -59,3 +59,4 @@ Budget_Test,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat
 Budget_Test,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[9, 1]",NA,14.662336047839958,3600.0286569595337,12.0,1,
 Budget_Test,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[9, 5]",NA,15.655079843996923,3600.112431049347,12.0,1,
 Budget_Test,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[9, 9]",NA,15.951554781765887,3600.0459730625153,12.0,1,
+Test Experiment,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9]",NA,16.823287040134296,238.68301010131836,2.0,2,
