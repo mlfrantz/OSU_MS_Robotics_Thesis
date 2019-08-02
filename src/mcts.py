@@ -166,7 +166,7 @@ class GameState:
             if [round(move[0],3),round(move[1],3)] not in [[round(p[0],3),round(p[1],3)] for p in self.path]:
                 # print("Move not in Path")
                 # pdb.set_trace()
-                if move[0] < 0 or move[0] >= self.field.shape[0] or move[1] < 0 or move[1] >= self.field.shape[1]:
+                if move[0] < 0 or move[0] >= self.field.shape[0]-1 or move[1] < 0 or move[1] >= self.field.shape[1]-1:
                     # Makes sure we are in bounds
                     continue
                 else:
@@ -305,7 +305,7 @@ def UCTPlayGame(field, start, budget, velocity_correction=1, end=None, direction
     # print(state.GetMoves())
     while (state.GetMoves() != []):
         # print(str(state))
-        m = UCT(rootstate = state, itermax = 100000, verbose = False) # play with values for itermax and verbose = True
+        m = UCT(rootstate = state, itermax = 50000, verbose = False) # play with values for itermax and verbose = True
         # print("Best Move: " + str(m) + "\n")
         state.DoMove(m)
         state.path = state.path[:] + [m]
@@ -313,7 +313,6 @@ def UCTPlayGame(field, start, budget, velocity_correction=1, end=None, direction
         # print(str(state))
     print(return_path)
     return return_path
-
 
 def main():
 

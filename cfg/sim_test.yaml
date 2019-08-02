@@ -1,0 +1,39 @@
+sim_period: 30
+roms_file: roms/txla_hindcast_agg_full_2013_07_10.nc
+generate_dynamic_obstacles: true
+science_variable: temperature
+sim_world:
+  center_latitude: 28.8
+  center_longitude: -92.7
+  width: 10
+  height: 10
+  resolution: 1
+init:
+  drifter:
+    transform_angle: 45.0
+    xpos: 0.0
+    ypos: -2.5
+  rose1:
+    xpos: 1.0
+    ypos: 1.0
+  rose2:
+    xpos: -1.0
+    ypos: -1.0
+  rose3:
+    xpos: 1.0
+    ypos: -1.0
+  rose4:
+    xpos: -1.0
+    ypos: 1.0
+  osu686:
+    xpos: -2.0
+    ypos: 2.0
+  osu683:
+    xpos: 2.0
+    ypos: -2.0
+  osu684:
+    xpos: -2.0
+    ypos: -2.0
+  osu685:
+    xpos: 2.0
+    ypos: 2.0

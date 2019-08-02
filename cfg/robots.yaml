@@ -18,6 +18,16 @@ glider4:
   type: 'glider'
   color: 'white'
 
+glider5:
+  vel: 0.4 # m/s
+  type: 'glider'
+  color: 'white'
+
+glider6:
+  vel: 0.4 # m/s
+  type: 'glider'
+  color: 'white'
+
 rose1:
   vel: 1.5 # m/s
   type: 'rose'

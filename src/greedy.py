@@ -305,7 +305,7 @@ def main():
                 try:
                     if args.same_point:
                         move = [path[-1][0] + velocity_correction[r]*d[0], path[-1][1] + velocity_correction[r]*d[1]]
-                        if move[0] >= 0 and move[0] < field.shape[0] and move[1] >= 0 and move[1] < field.shape[1]:
+                        if move[0] >= 0 and move[0] <= field.shape[0]-1 and move[1] >= 0 and move[1] <= field.shape[1]-1:
                             # print(move,move[0], move[1],move[0] >= 0 and move[0] < field.shape[0] and move[1] >= 0 and move[1] < field.shape[1])
                             # Makes sure we are in
                             if [round(move[0],3),round(move[1],3)] not in [[round(p[0],3),round(p[1],3)] for p in path]:
