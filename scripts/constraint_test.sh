@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PATH='/home/mlfrantz/Documents/MIP_Research/mip_research'
-outfile_path='/home/mlfrantz/Documents/MIP_Research/mip_research/data/constraint_test_map3.csv'
+outfile_path='/home/mlfrantz/Documents/MIP_Research/mip_research/data/constraint_test_map4.csv'
 # outfile_path='/home/mlfrantz/Documents/MIP_Research/mip_research/data/test.csv'
 
 experiment_name='Constraint_Test'
