@@ -1,8 +1,8 @@
 #!/bin/bash
 
 PATH='/home/mlfrantz/Documents/MIP_Research/mip_research'
-# outfile_path='/home/mlfrantz/Documents/MIP_Research/mip_research/data/constraint_test_map4.csv'
-outfile_path='/home/mlfrantz/Documents/MIP_Research/mip_research/data/test.csv'
+outfile_path='/home/mlfrantz/Documents/MIP_Research/mip_research/data/constraint_test_map1.csv'
+# outfile_path='/home/mlfrantz/Documents/MIP_Research/mip_research/data/test.csv'
 
 experiment_name='Constraint_Test'
 
@@ -26,8 +26,8 @@ do
       do
         echo $c $b $x $y
         # $PATH/src/mip_test.py -n $b -s $x $y -t 1800 -r glider1 -o $outfile_path --experiment_name $experiment_name $c
-        $PATH/src/greedy.py -n $b -s $x $y -r glider1 -o $outfile_path --experiment_name $experiment_name
-        $PATH/src/mcts.py -n $b -s $x $y -r glider1 -o $outfile_path --experiment_name $experiment_name
+        $PATH/src/greedy.py -n $b -s $x $y -r glider1 -o $outfile_path --experiment_name $experiment_name $c
+        $PATH/src/mcts.py -n $b -s $x $y -r glider1 -o $outfile_path --experiment_name $experiment_name $c
       done
     done
   done

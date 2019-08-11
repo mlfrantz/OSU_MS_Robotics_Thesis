@@ -453,7 +453,7 @@ def main():
         constraint_string = dir_str
 
         try:
-            score_str = '_score_%f' % sum([bilinear_interpolation(p, field) for path in paths for p in path])
+            score_str = sum([bilinear_interpolation(p, field) for path in paths for p in path])
         except TypeError:
             score_str = '_no_solution'
 

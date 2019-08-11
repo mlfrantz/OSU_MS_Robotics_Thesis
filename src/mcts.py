@@ -633,7 +633,7 @@ def main():
 
         # score_str = sum([field[p[0],p[1],0] for p in path])
         try:
-            score_str = '_score_%f' % sum([bilinear_interpolation(p, field) for path in paths for p in path])
+            score_str = sum([bilinear_interpolation(p, field) for path in paths for p in path])
         except TypeError:
             score_str = '_no_solution'
 
