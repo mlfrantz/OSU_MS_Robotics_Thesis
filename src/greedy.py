@@ -35,20 +35,22 @@ def bilinear_interpolation(point, field):
 
     x = point[0]
     y = point[1]
+    try:
+        points = sorted(corners(point,field))               # order points by x, then by y
+        (x1, y1, q11), (_x1, y2, q12), (x2, _y1, q21), (_x2, _y2, q22) = points
 
-    points = sorted(corners(point,field))               # order points by x, then by y
-    (x1, y1, q11), (_x1, y2, q12), (x2, _y1, q21), (_x2, _y2, q22) = points
+        if x1 != _x1 or x2 != _x2 or y1 != _y1 or y2 != _y2:
+            raise ValueError('points do not form a rectangle')
+        if not x1 <= x <= x2 or not y1 <= y <= y2:
+            raise ValueError('(x, y) not within the rectangle')
 
-    if x1 != _x1 or x2 != _x2 or y1 != _y1 or y2 != _y2:
-        raise ValueError('points do not form a rectangle')
-    if not x1 <= x <= x2 or not y1 <= y <= y2:
-        raise ValueError('(x, y) not within the rectangle')
-
-    return (q11 * (x2 - x) * (y2 - y) +
-            q21 * (x - x1) * (y2 - y) +
-            q12 * (x2 - x) * (y - y1) +
-            q22 * (x - x1) * (y - y1)
-           ) / ((x2 - x1) * (y2 - y1) + 0.0)
+        return (q11 * (x2 - x) * (y2 - y) +
+                q21 * (x - x1) * (y2 - y) +
+                q12 * (x2 - x) * (y - y1) +
+                q22 * (x - x1) * (y - y1)
+               ) / ((x2 - x1) * (y2 - y1) + 0.0)
+    except TypeError:
+        print("Failed, no solution.")
 
 def corners(point,field):
     corners = []
@@ -79,7 +81,8 @@ def corners(point,field):
                     (corners[1], corners[2], field[corners[1], corners[2], 0]), \
                     (corners[1], corners[3], field[corners[1], corners[3], 0])]
     except:
-        pdb.set_trace()
+        # pdb.set_trace()
+        print("Failed, no solution.")
     return corners
 
 def main():
@@ -194,24 +197,36 @@ def main():
     if not args.test:
         # ROMS map
         # Loading Simulation-Specific Parameters
+        fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
+
         with open(os.path.expandvars(args.sim_cfg),'rb') as f:
             yaml_sim = yaml.load(f.read())
 
-        wd = World.roms(
-            datafile_path=yaml_sim['roms_file'],
-            xlen        = yaml_sim['sim_world']['width'],
-            ylen        = yaml_sim['sim_world']['height'],
-            center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
-            feature     = yaml_sim['science_variable'],
-            resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
-            )
+        try:
+            field = np.load(fieldSavePath)
+            norm_field = np.load(fieldSavePath)
+            print("Loaded Map Successfully")
+        except IOError:
 
-        # This is the scalar_field in a static word.
-        # The '0' is the first time step and goes up to some max time
-        # field = np.copy(wd.scalar_field[:,:,0])
-        field = np.copy(wd.scalar_field)
-        norm_field = normalize(field)
-        field = normalize(field) # This will normailze the field between 0-1
+            wd = World.roms(
+                datafile_path=yaml_sim['roms_file'],
+                xlen        = yaml_sim['sim_world']['width'],
+                ylen        = yaml_sim['sim_world']['height'],
+                center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
+                feature     = yaml_sim['science_variable'],
+                resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
+                )
+
+            # This is the scalar_field in a static word.
+            # The '0' is the first time step and goes up to some max time
+            # field = np.copy(wd.scalar_field[:,:,0])
+            field = np.copy(wd.scalar_field)
+
+            norm_field = normalize(field)
+            field = normalize(field) # This will normailze the field between 0-1
+
+            fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
+            np.save(fieldSavePath, field)
 
         # Example of an obstacle, make the value very low in desired area
         # field[int(len(field)/4):int(3*len(field)/4),int(len(field)/4):int(3*len(field)/4)] = -100
@@ -301,7 +316,6 @@ def main():
             values = np.zeros(len(directions))
 
             for i,d in enumerate(directions):
-                # print(path[-1])
                 try:
                     if args.same_point:
                         move = [path[-1][0] + velocity_correction[r]*d[0], path[-1][1] + velocity_correction[r]*d[1]]
@@ -309,8 +323,7 @@ def main():
                             # print(move,move[0], move[1],move[0] >= 0 and move[0] < field.shape[0] and move[1] >= 0 and move[1] < field.shape[1])
                             # Makes sure we are in
                             if [round(move[0],3),round(move[1],3)] not in [[round(p[0],3),round(p[1],3)] for p in path]:
-                                # print(path,move)
-                                # print("Not in path", path)
+                                # print(move)
                                 values[i] = bilinear_interpolation(move, field)
                                 # values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
                             else:
@@ -320,9 +333,9 @@ def main():
                             # Makes sure we are in
                             continue
                     else:
-                        # values[i] = field[path[-1][0] + d[0], path[-1][1] + d[1], 0]
-                        # print("Same point allowed")
-                        values[i] = bilinear_interpolation(move, field)
+                        move = [path[-1][0] + velocity_correction[r]*d[0], path[-1][1] + velocity_correction[r]*d[1]]
+                        if move[0] >= 0 and move[0] <= field.shape[0]-1 and move[1] >= 0 and move[1] <= field.shape[1]-1:
+                            values[i] = bilinear_interpolation(move, field)
                 except:
                     continue
             # print(values)
@@ -334,6 +347,14 @@ def main():
     runTime = time.time() - startTime
 
     if args.gen_image:
+        wd = World.roms(
+            datafile_path=yaml_sim['roms_file'],
+            xlen        = yaml_sim['sim_world']['width'],
+            ylen        = yaml_sim['sim_world']['height'],
+            center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
+            feature     = yaml_sim['science_variable'],
+            resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
+            )
 
         if args.gradient:
             # plt.imshow(mag_grad_field.transpose())#, interpolation='gaussian', cmap= 'gnuplot')
@@ -399,7 +420,11 @@ def main():
             dir_str = ''
 
         # print(sum([field[p[0],p[1],0] for p in path]))
-        score_str = '_score_%f' % sum([bilinear_interpolation(p, field) for path in paths for p in path])
+
+        try:
+            score_str = '_score_%f' % sum([bilinear_interpolation(p, field) for path in paths for p in path])
+        except TypeError:
+            score_str = '_no_solution'
 
         file_string = 'greedy_' + time.strftime("%Y%m%d-%H%M%S") + \
                                                                     robots_str + \
@@ -427,8 +452,10 @@ def main():
 
         constraint_string = dir_str
 
-        # Probably will need to update this
-        score_str = sum([bilinear_interpolation(p, field) for path in paths for p in path])
+        try:
+            score_str = '_score_%f' % sum([bilinear_interpolation(p, field) for path in paths for p in path])
+        except TypeError:
+            score_str = '_no_solution'
 
         with open(filename, 'a', newline='') as csvfile:
             fieldnames = [  'Experiment', \

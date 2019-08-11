@@ -171,25 +171,36 @@ def main():
     if not args.test:
         # ROMS map
         # Loading Simulation-Specific Parameters
+        fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
+
         with open(os.path.expandvars(args.sim_cfg),'rb') as f:
             yaml_sim = yaml.load(f.read())
 
-        wd = World.roms(
-            datafile_path=yaml_sim['roms_file'],
-            xlen        = yaml_sim['sim_world']['width'],
-            ylen        = yaml_sim['sim_world']['height'],
-            center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
-            feature     = yaml_sim['science_variable'],
-            resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
-            )
+        try:
+            field = np.load(fieldSavePath)
+            norm_field = np.load(fieldSavePath)
+            print("Loaded Map Successfully")
+        except IOError:
 
-        # This is the scalar_field in a static word.
-        # The '0' is the first time step and goes up to some max time
-        # field = np.copy(wd.scalar_field[:,:,0])
-        field = np.copy(wd.scalar_field)
+            wd = World.roms(
+                datafile_path=yaml_sim['roms_file'],
+                xlen        = yaml_sim['sim_world']['width'],
+                ylen        = yaml_sim['sim_world']['height'],
+                center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
+                feature     = yaml_sim['science_variable'],
+                resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
+                )
 
-        norm_field = normalize(field)
-        field = normalize(field) # This will normailze the field between 0-1
+            # This is the scalar_field in a static word.
+            # The '0' is the first time step and goes up to some max time
+            # field = np.copy(wd.scalar_field[:,:,0])
+            field = np.copy(wd.scalar_field)
+
+            norm_field = normalize(field)
+            field = normalize(field) # This will normailze the field between 0-1
+
+            fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
+            np.save(fieldSavePath, field)
 
         # Example of an obstacle, make the value very low in desired area
         # field[int(len(field)/4):int(3*len(field)/4),int(len(field)/4):int(3*len(field)/4)] = -100
@@ -505,6 +516,15 @@ def main():
     #         print("%s %f" % (v.varName, v.X))
 
     if args.gen_image:
+        wd = World.roms(
+            datafile_path=yaml_sim['roms_file'],
+            xlen        = yaml_sim['sim_world']['width'],
+            ylen        = yaml_sim['sim_world']['height'],
+            center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
+            feature     = yaml_sim['science_variable'],
+            resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
+            )
+
         # Plotting Code
         path_x = m.getAttr('X', x).values()
         path_y = m.getAttr('X', y).values()
@@ -520,7 +540,7 @@ def main():
         if args.gradient:
             # plt.imshow(mag_grad_field.transpose())#, interpolation='gaussian', cmap= 'gnuplot')
             if not args.test:
-                plt.imshow(wd.scalar_field[:,:,0].transpose(), interpolation='gaussian', cmap= 'gnuplot')
+                plt.imshow(norm_field[:,:,0].transpose(), interpolation='gaussian', cmap= 'gnuplot')
                 plt.xticks(np.arange(0,len(wd.lon_ticks), (1/min(field_resolution))), np.around(wd.lon_ticks[0::int(1/min(field_resolution))], 2))
                 plt.yticks(np.arange(0,len(wd.lat_ticks), (1/min(field_resolution))), np.around(wd.lat_ticks[0::int(1/min(field_resolution))], 2))
                 plt.xlabel('Longitude', fontsize=20)

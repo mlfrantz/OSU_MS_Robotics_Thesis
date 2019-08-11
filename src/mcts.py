@@ -102,13 +102,14 @@ class GameState:
         GetRandomMove() function to generate a random move during rollout.
         By convention the players are numbered 1 and 2.
     """
-    def __init__(self, field, position, budget, path, velocity_correction = 1, end = None, direction_constr = '8_direction'):
+    def __init__(self, field, position, budget, path, velocity_correction = 1, end = None, direction_constr = '8_direction', same_point = True):
         self.field = field # Scalar field
         self.pos = position # Position of robot, starts at the start imagine that
         self.end = end # Ending position
         self.budget = budget # How many hours are we planning for / or number of steps?
         self.path = path
         self.vel = velocity_correction
+        self.same_point = same_point
 
         # Build the direction vectors for checking values
         self.dir_contr = direction_constr
@@ -122,7 +123,7 @@ class GameState:
 
     def Clone(self):
         """ Create a deep clone of this game state."""
-        st = GameState(self.field, self.pos, self.budget, self.path, self.vel, self.end, direction_constr=self.dir_contr)
+        st = GameState(self.field, self.pos, self.budget, self.path, self.vel, self.end, direction_constr=self.dir_contr, same_point=self.same_point)
         return st
 
     def DoMove(self, move):
@@ -161,23 +162,17 @@ class GameState:
             except TypeError:
                 move =  [float(self.pos[0]) + self.vel*int(d[0]), float(self.pos[1]) + self.vel*int(d[1])]
 
-            # print(move[0], move[1])
-            # if move not in self.path:
-            if [round(move[0],3),round(move[1],3)] not in [[round(p[0],3),round(p[1],3)] for p in self.path]:
-                # print("Move not in Path")
-                # pdb.set_trace()
-                if move[0] < 0 or move[0] >= self.field.shape[0]-1 or move[1] < 0 or move[1] >= self.field.shape[1]-1:
-                    # Makes sure we are in bounds
-                    continue
-                else:
-                    # print(moves)
-                    moves.append(move)
-            else:
+            if move[0] < 0 or move[0] >= self.field.shape[0]-1 or move[1] < 0 or move[1] >= self.field.shape[1]-1:
                 continue
-            # else:
-            #     values[i] = self.field[self.path[-1][0] + d[0], self.path[-1][1] + d[1], 0]
-            # except:
-            #     continue
+
+            if self.same_point:
+                if [round(move[0],3),round(move[1],3)] not in [[round(p[0],3),round(p[1],3)] for p in self.path]:
+                    moves.append(move)
+                else:
+                    continue
+            else:
+                moves.append(move)
+
         return moves
 
     def GetResult(self, move):
@@ -295,12 +290,12 @@ def UCT(rootstate, itermax, verbose = False):
     # return sorted(rootnode.childNodes, key = lambda c: c.wins)[-1].move # return the move that has the highest wins
     return sorted(rootnode.childNodes, key = lambda c: c.visits)[-1].move # return the move that has the most visits
 
-def UCTPlayGame(field, start, budget, velocity_correction=1, end=None, direction_constr='8_direction'):
+def UCTPlayGame(field, start, budget, velocity_correction=1, end=None, direction_constr='8_direction',same_point=True):
     """ Play a sample game between two UCT players where each player gets a different number
         of UCT iterations (= simulations = tree nodes).
     """
 
-    state = GameState(field, start, budget, start, velocity_correction, end, direction_constr)
+    state = GameState(field, start, budget, start, velocity_correction, end, direction_constr, same_point)
     return_path = start
     # print(state.GetMoves())
     while (state.GetMoves() != []):
@@ -422,28 +417,40 @@ def main():
     # Path lenth in time (hours).
     Np = args.planning_time
 
-    # Load the map from either ROMS data or test file
+# Load the map from either ROMS data or test file
     if not args.test:
         # ROMS map
         # Loading Simulation-Specific Parameters
+        fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
+
         with open(os.path.expandvars(args.sim_cfg),'rb') as f:
             yaml_sim = yaml.load(f.read())
 
-        wd = World.roms(
-            datafile_path=yaml_sim['roms_file'],
-            xlen        = yaml_sim['sim_world']['width'],
-            ylen        = yaml_sim['sim_world']['height'],
-            center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
-            feature     = yaml_sim['science_variable'],
-            resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
-            )
+        try:
+            field = np.load(fieldSavePath)
+            norm_field = np.load(fieldSavePath)
+            print("Loaded Map Successfully")
+        except IOError:
 
-        # This is the scalar_field in a static word.
-        # The '0' is the first time step and goes up to some max time
-        # field = np.copy(wd.scalar_field[:,:,0])
-        field = np.copy(wd.scalar_field)
-        norm_field = normalize(field)
-        field = normalize(field) # This will normailze the field between 0-1
+            wd = World.roms(
+                datafile_path=yaml_sim['roms_file'],
+                xlen        = yaml_sim['sim_world']['width'],
+                ylen        = yaml_sim['sim_world']['height'],
+                center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
+                feature     = yaml_sim['science_variable'],
+                resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
+                )
+
+            # This is the scalar_field in a static word.
+            # The '0' is the first time step and goes up to some max time
+            # field = np.copy(wd.scalar_field[:,:,0])
+            field = np.copy(wd.scalar_field)
+
+            norm_field = normalize(field)
+            field = normalize(field) # This will normailze the field between 0-1
+
+            fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
+            np.save(fieldSavePath, field)
 
         # Example of an obstacle, make the value very low in desired area
         # field[int(len(field)/4):int(3*len(field)/4),int(len(field)/4):int(3*len(field)/4)] = -100
@@ -513,12 +520,20 @@ def main():
 
     paths = []
     for r in robots:
-        paths.append(UCTPlayGame(field, [start[r]], len(steps[r]), velocity_correction[r], None, args.direction_constr))
+        paths.append(UCTPlayGame(field, [start[r]], len(steps[r]), velocity_correction[r], None, args.direction_constr, args.same_point))
 
     runTime = time.time() - startTime
 
     if args.gen_image:
         # # Plotting Code
+        wd = World.roms(
+            datafile_path=yaml_sim['roms_file'],
+            xlen        = yaml_sim['sim_world']['width'],
+            ylen        = yaml_sim['sim_world']['height'],
+            center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
+            feature     = yaml_sim['science_variable'],
+            resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
+            )
 
         print(paths)
 
@@ -585,10 +600,10 @@ def main():
         else:
             dir_str = ''
 
-        # print(sum([field[p[0],p[1],0] for p in path]))
-        # print(sum([bilinear_interpolation(p, field) for p in path for path in paths]))
-        score_str = '_score_%f' % sum([bilinear_interpolation(p, field) for path in paths for p in path])
-
+        try:
+            score_str = '_score_%f' % sum([bilinear_interpolation(p, field) for path in paths for p in path])
+        except TypeError:
+            score_str = '_no_solution'
 
         file_string = 'mcts_' + time.strftime("%Y%m%d-%H%M%S") + \
                                                                     robots_str + \
@@ -617,7 +632,10 @@ def main():
         constraint_string = dir_str
 
         # score_str = sum([field[p[0],p[1],0] for p in path])
-        score_str = sum([bilinear_interpolation(p, field) for path in paths for p in path])
+        try:
+            score_str = '_score_%f' % sum([bilinear_interpolation(p, field) for path in paths for p in path])
+        except TypeError:
+            score_str = '_no_solution'
 
         with open(filename, 'a', newline='') as csvfile:
             fieldnames = [  'Experiment', \
