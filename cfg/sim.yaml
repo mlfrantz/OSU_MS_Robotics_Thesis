@@ -13,8 +13,8 @@ science_variable: "temperature"
 
 # Region of the ocean to simulate using roms data
 sim_world:
-  center_latitude: 28.8 #25.00 #28.82 #29.00 #28.75 #       #Box Center (Decimal Degrees Latitude)
-  center_longitude: -92.7 #-96.50 #-91.19 #-91.7 #-93.25 #  -91.19   #Box Center (Decimal Degrees Longitude)
+  center_latitude: 25.00 #28.82 #28.75 #29.00 #28.8      #Box Center (Decimal Degrees Latitude)
+  center_longitude: -96.50 #-91.19 #-93.25 #-91.7 #-92.7 #    #Box Center (Decimal Degrees Longitude)
   width: 10                    #Box Width (km)
   height: 10                   #Box Height (km)
   resolution: 1              #World Resolution (km)

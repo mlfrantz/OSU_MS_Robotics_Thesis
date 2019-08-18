@@ -171,10 +171,11 @@ def main():
     if not args.test:
         # ROMS map
         # Loading Simulation-Specific Parameters
-        fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
 
         with open(os.path.expandvars(args.sim_cfg),'rb') as f:
             yaml_sim = yaml.load(f.read())
+
+        fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field_{}_{}.npy'.format(str(abs(yaml_sim['sim_world']['center_longitude'])),yaml_sim['sim_world']['center_latitude'])
 
         try:
             field = np.load(fieldSavePath)

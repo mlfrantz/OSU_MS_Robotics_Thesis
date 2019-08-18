@@ -197,11 +197,12 @@ def main():
     if not args.test:
         # ROMS map
         # Loading Simulation-Specific Parameters
-        fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
 
         with open(os.path.expandvars(args.sim_cfg),'rb') as f:
             yaml_sim = yaml.load(f.read())
 
+        fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field_{}_{}.npy'.format(str(abs(yaml_sim['sim_world']['center_longitude'])),yaml_sim['sim_world']['center_latitude'])
+        
         try:
             field = np.load(fieldSavePath)
             norm_field = np.load(fieldSavePath)
@@ -225,7 +226,7 @@ def main():
             norm_field = normalize(field)
             field = normalize(field) # This will normailze the field between 0-1
 
-            fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
+            # fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
             np.save(fieldSavePath, field)
 
         # Example of an obstacle, make the value very low in desired area
@@ -455,7 +456,7 @@ def main():
         try:
             score_str = sum([bilinear_interpolation(p, field) for path in paths for p in path])
         except TypeError:
-            score_str = '_no_solution'
+            score_str = 0#'_no_solution'
 
         with open(filename, 'a', newline='') as csvfile:
             fieldnames = [  'Experiment', \
