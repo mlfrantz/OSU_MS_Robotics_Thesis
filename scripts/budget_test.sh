@@ -10,7 +10,7 @@ experiment_name='Budget_Test'
 xPoints='1 5 9'
 yPoints='1 5 9'
 
-budget='10'
+budget='8'
 # budget='10 12'
 
 for b in $budget
