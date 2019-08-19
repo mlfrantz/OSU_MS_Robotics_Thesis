@@ -744,7 +744,6 @@ Budget_Test,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat
 Budget_Test,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[9, 1]",NA,7.7420310530128935,0.5226359367370605,8.0,1,
 Budget_Test,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[9, 5]",NA,8.811050666400643,0.433150053024292,8.0,1,
 Budget_Test,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[9, 9]",NA,9.368984498788176,0.43935608863830566,8.0,1,
-Experiment,Algorithm,Map,Map Center,Map Resolution,Start Point,End Point,Score,Run Time (sec),Budget (hours),Number of Robots,Constraints
 Constraint_Test,Random,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1]",NA,0.3592029447410964,0.00012803077697753906,1.0,1,none
 Constraint_Test,Random,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 5]",NA,1.6270632894133819,0.0001342296600341797,1.0,1,none
 Constraint_Test,Random,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 9]",NA,0.1483965071191981,0.00011920928955078125,1.0,1,none
