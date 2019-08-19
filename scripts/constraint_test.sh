@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PATH='/home/mlfrantz/Documents/MIP_Research/mip_research'
-outfile_path='/home/mlfrantz/Documents/MIP_Research/mip_research/data/constraint_test_greedy_mcts.csv'
+outfile_path='/home/mlfrantz/Documents/MIP_Research/mip_research/data/constraint_test_random.csv'
 SIM='cfg/sim_test.yaml'
 # outfile_path='/home/mlfrantz/Documents/MIP_Research/mip_research/data/test.csv'
 
@@ -13,11 +13,11 @@ SIMXY=('29.00 -91.7' '28.8 -92.7' '28.75 -93.25' '25.00 -96.50' '28.82 -91.19')
 xPoints='1 5 9'
 yPoints='1 5 9'
 
-budget='1 2 4 8'
+budget='10'
 # budget='10 12'
 
 # constraint=('-d nsew' '-d diag' '--anti_curl' '--force_curl' '--same_point')
-constraint=('-d nsew' '-d diag' '--same_point')
+constraint=('-d 8_direction' '-d nsew' '-d diag' '--same_point')
 
 for xy in "${SIMXY[@]}";
 do
@@ -33,8 +33,9 @@ do
         do
           echo $c $b $x $y
           # $PATH/src/mip_test.py -n $b -s $x $y -t 1800 -r glider1 -o $outfile_path --experiment_name $experiment_name $c
-          $PATH/src/greedy.py -n $b -s $x $y -r glider1 -o $outfile_path --experiment_name $experiment_name $c --sim_cfg $SIM
-          $PATH/src/mcts.py -n $b -s $x $y -r glider1 -o $outfile_path --experiment_name $experiment_name $c --sim_cfg $SIM
+          # $PATH/src/greedy.py -n $b -s $x $y -r glider1 -o $outfile_path --experiment_name $experiment_name $c --sim_cfg $SIM
+          # $PATH/src/mcts.py -n $b -s $x $y -r glider1 -o $outfile_path --experiment_name $experiment_name $c --sim_cfg $SIM
+          $PATH/src/random_move.py -n $b -s $x $y -r glider1 -o $outfile_path --experiment_name $experiment_name $c --sim_cfg $SIM
         done
       done
     done
