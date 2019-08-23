@@ -1,7 +1,7 @@
 glider1:
   vel: 0.4 # m/s
   type: 'glider'
-  color: 'orange'
+  color: 'white'
 
 glider2:
   vel: 0.4 # m/s
@@ -31,7 +31,7 @@ glider6:
 rose1:
   vel: 1.5 # m/s
   type: 'rose'
-  color: 'pink'
+  color: 'blue'
 
 rose2:
   vel: 1.5 # m/s

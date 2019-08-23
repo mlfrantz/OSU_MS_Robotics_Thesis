@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from gurobipy import *
 from sas_utils import World, Location
+from math import sqrt
 
 def normalize(data, index=0):
     # This function scales the data between 0-1. the 'index' variable is to select
@@ -229,6 +230,7 @@ def main():
         # The expresseion solves for the number of waypoints so a +1 is needed for range.
         # For instance, a glider going 0.4m/s would travel 1.44Km in 1 hour so it needs at least 2 waypoints, start and end.
         plan_range = int(np.round(value['vel']*Np*60*60*0.001*(1/min(field_resolution))))+1
+        print(plan_range)
         if plan_range > 0:
             steps.append(range(plan_range))
         else:
@@ -238,6 +240,7 @@ def main():
     temp_len = [len(s) for s in steps]
     steps = [steps[np.argmax(temp_len)]]*len(steps) # This makes everything operate at the same time
     velocity_correction = [t/max(temp_len) for t in temp_len] # To account for time difference between arriving to waypoints
+    # velocity_correction = [1 for t in temp_len] # To account for time difference between arriving to waypoints
 
     # Make time correction for map forward propagation
     max_steps = max([len(s) for s in steps])
@@ -284,6 +287,9 @@ def main():
             m.addSOS(GRB.SOS_TYPE2, [lx[r,t,i] for i in DX])
             m.addSOS(GRB.SOS_TYPE2, [ly[r,t,j] for j in DY])
 
+    budget = m.addVars(pairs, lb=0, ub=len(steps[0]), vtype=GRB.CONTINUOUS, name="budget")
+    m.addConstrs((budget[r, steps[r][0]] == len(steps[0]) for r in robots), name="Initial Budget")
+
     # Add main constraints
 
     # Starting position contraint
@@ -327,20 +333,44 @@ def main():
         # m.addConstrs((quicksum(field[i,j,field_time_steps[t]]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
         m.addConstrs((quicksum(field[i,j,0]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
     # Primary Motion constraints
+
+
+    # There is something to this but it doesnt work as is
+
+    if len(args.straight_line) > 0:
+        # Now we need to correct our previous velocity_correction by making sure the edges are the lengths of the edges are all equal.
+        path_len_x = args.straight_line[0]
+        path_len_y = args.straight_line[1]
+
+        # if path_len_x > 1 or path_len_y > 1:
+        #     print(steps)
+        #     pdb.set_trace()
+        #     for r in robots:
+        #         steps = [s for s in steps[r]]
+
+    else:
+        path_len_x = 1
+        path_len_y = 1
+
+    # for r in robots:
+    #     v = velocity_correction[r]
+    #     m.addQConstr( (quicksum( (((x[r,t-1]-x[r,t])*(x[r,t-1]-x[r,t])) + \
+    #                   ((y[r,t-1]-y[r,t])*(y[r,t-1]-y[r,t]))) for t in steps[r][1:])) <= (len(steps[r]))  ) # -1 becuase we added a step above
+
+    # m.addConstrs(( quicksum( ((x[r,t-1]-x[r,t])*(x[r,t-1]-x[r,t])) + ((y[r,t-1]-y[r,t])*(y[r,t-1]-y[r,t])) )  <= len(steps[r]) for r in robots for t in steps[r][1:] ))
+
     # Binary variables for motion constraints
     b_range = range(4)
     b = m.addVars(pairs, b_range, vtype=GRB.BINARY, name='b%d' % t)
-
-    # There is something to this but it doesnt work as is
-    block = 1
     for r in robots:
         v = velocity_correction[r]
         for t in steps[r][1:]:
             # pdb.set_trace()
-            m.addConstr(x[r,t-1] + v*block*b[r,t,0] - v*block*b[r,t,1] == x[r,t])
+            m.addConstr(x[r,t-1] + v*path_len_x*b[r,t,0] - v*path_len_x*b[r,t,1] == x[r,t])
             m.addConstr(b[r,t,0] + b[r,t,1] <= 1)
-            m.addConstr(y[r,t-1] + v*b[r,t,2] - v*b[r,t,3] == y[r,t])
+            m.addConstr(y[r,t-1] + v*path_len_y*b[r,t,2] - v*path_len_y*b[r,t,3] == y[r,t])
             m.addConstr(b[r,t,2] + b[r,t,3] <= 1)
+            # m.addConstr(budget[r,t-1] - (b[r,t,0] + b[r,t,1] + b[r,t,2] + b[r,t,3])  == budget[r,t])
 
     # Add option constraints
 
@@ -381,7 +411,7 @@ def main():
     elif args.sync == 'ew':
         for r in robots:
             v = velocity_correction[r]
-            for t in steps[r][1:]:
+            for t in steps[r][3:7]:
                 m.addConstr(x[r,t-1] - x[r,t] == v)
                 m.addConstr(y[r,t-1] - y[r,t] == 0)
     elif args.sync == 'we':
@@ -415,14 +445,27 @@ def main():
                 m.addConstr(x[r,t] - x[r,t-1] == v)
                 m.addConstr(y[r,t-1] - y[r,t] == v)
     elif args.sync == 'path':
-        path = [(0,5), (1,4), (2,3), (3,2), (4,1), (5,0), (6,1), (7,2), (8,3), (9,4), (10,5), (9,6), (8,7), \
-        (7,8), (6,9), (5,10), (4,9), (3,8), (2,7), (1,6), (0,5)]
+        #path = [(0,5), (1,4), (2,3), (3,2), (4,1), (5,0), (6,1), (7,2), (8,3), (9,4), (10,5), (9,6), (8,7), \
+        #(7,8), (6,9), (5,10), (4,9), (3,8), (2,7), (1,6), (0,5)]
+        path = [(0,0),(0,1),(-1,1), (-1,2), (-2,2), (-2,1)]
         path_len = np.sum(np.abs(np.subtract(path[:-1],path[1:])))
         for r in robots:
             v = velocity_correction[r]
-            for t in steps[r][1:]:
+            for t in steps[r][1:len(path)]:
                 m.addConstr(x[r,t] - x[r,t-1] == path[t][0] - path[t-1][0])
                 m.addConstr(y[r,t] - y[r,t-1] == path[t][1] - path[t-1][1])
+    elif args.sync == 'path_time':
+        #path = [(0,5), (1,4), (2,3), (3,2), (4,1), (5,0), (6,1), (7,2), (8,3), (9,4), (10,5), (9,6), (8,7), \
+        #(7,8), (6,9), (5,10), (4,9), (3,8), (2,7), (1,6), (0,5)]
+        path = [(3,3,5),(4,3,6),(4,4,7), (3,4,8), (2,4,9), (2,3,10)]
+        path_len = np.sum(np.abs(np.subtract(path[:-1],path[1:])))
+        for r in robots:
+            v = velocity_correction[r]
+            times = [p[2] for p in path]
+            # pdb.set_trace()
+            for i,t in enumerate(times):
+                m.addConstr(x[r,t] == path[i][0])
+                m.addConstr(y[r,t] == path[i][1])
 
 
     # Constraint to prevent colliding with other robots.
@@ -465,32 +508,34 @@ def main():
             m.addConstrs(y[r,t] - y[r,t-t_delta] <= v*delta for t in steps[r][t_delta:])
 
     # Straight path constraints (Questionable functionality)
-    if len(args.straight_line) > 0:
-        # Now we need to correct our previous velocity_correction by making sure the edges are the lengths of the edges are all equal.
-        path_len_x = args.straight_line[0]
-        path_len_y = args.straight_line[1]
-        delta = max(path_len_x,path_len_y)
-        M = 1000
-        for r in robots:
-            for v in velocity_correction:
-                inv_v = 1/v
-                if inv_v > 1:
-                    tv = m.addVars(steps[r][delta:], range(4), vtype=GRB.BINARY, name='t1')
-                    for t in steps[r][delta:]:
-                        m.addConstr(x[r,t-delta] - x[r,t] >= path_len_x*v - M*tv[t,0] )
-                        m.addConstr(x[r,t] - x[r,t-delta] >= path_len_x*v - M*tv[t,1] )
-                        m.addConstr(y[r,t-delta] - y[r,t] >= path_len_y*v - M*tv[t,2] )
-                        m.addConstr(y[r,t] - y[r,t-delta] >= path_len_y*v - M*tv[t,3] )
-                        m.addConstr(tv[t,0] + tv[t,1] + tv[t,2] + tv[t,3] == 3 )
-                else:
-                    # Working better
-                    ts = m.addVars(steps[r][delta:], range(4), vtype=GRB.BINARY, name='ts')
-                    for t in steps[r][delta:]:
-                        m.addConstr(x[r,t-delta] - x[r,t] >= path_len_x - M*ts[t,0])
-                        m.addConstr(x[r,t] - x[r,t-delta] >= path_len_x - M*ts[t,1])
-                        m.addConstr(y[r,t-delta] - y[r,t] >= path_len_y - M*ts[t,2])
-                        m.addConstr(y[r,t] - y[r,t-delta] >= path_len_y - M*ts[t,3])
-                        m.addConstr(ts[t,0] + ts[t,1] + ts[t,2] + ts[t,3] == 3 )
+    # if len(args.straight_line) > 0:
+    #     # Now we need to correct our previous velocity_correction by making sure the edges are the lengths of the edges are all equal.
+    #     path_len_x = args.straight_line[0]
+    #     path_len_y = args.straight_line[1]
+    #     delta = max(path_len_x,path_len_y)
+    #     print(delta, path_len_y)
+    #     M = 1000
+    #     for r in robots:
+    #         for v in velocity_correction:
+    #             inv_v = 1/v
+    #             if inv_v > 1:
+    #                 tv = m.addVars(steps[r][delta:], range(4), vtype=GRB.BINARY, name='t1')
+    #                 for t in steps[r][delta:]:
+    #                     m.addConstr(x[r,t-delta] - x[r,t] >= path_len_x*v - M*tv[t,0] )
+    #                     m.addConstr(x[r,t] - x[r,t-delta] >= path_len_x*v - M*tv[t,1] )
+    #                     m.addConstr(y[r,t-delta] - y[r,t] >= path_len_y*v - M*tv[t,2] )
+    #                     m.addConstr(y[r,t] - y[r,t-delta] >= path_len_y*v - M*tv[t,3] )
+    #                     m.addConstr(tv[t,0] + tv[t,1] + tv[t,2] + tv[t,3] == 3 )
+    #             else:
+    #                 # Working better
+    #                 ts = m.addVars(steps[r][delta:], range(4), vtype=GRB.BINARY, name='ts')
+    #                 for t in steps[r][delta:]:
+    #                     m.addConstr(x[r,t-delta] - x[r,t] >= path_len_x - M*ts[t,0])
+    #                     m.addConstr(x[r,t] - x[r,t-delta] >= path_len_x - M*ts[t,1])
+    #                     m.addConstr(y[r,t-delta] - y[r,t] >= path_len_y - M*ts[t,2])
+    #                     m.addConstr(y[r,t] - y[r,t-delta] >= path_len_y - M*ts[t,3])
+    #                     m.addConstr(ts[t,0] + ts[t,1] + ts[t,2] + ts[t,3] <= 2 )
+    #                     #
 
     # Area Constraint (Start with square, expand to more complex shapes)
     if len(args.rect_area) > 0:
@@ -537,7 +582,10 @@ def main():
             _paths = _paths[len(steps[r]):]
 
         print(paths)
+        dist=paths[0][:]
+        print(sum([np.sqrt( (dist[i][0]-dist[i+1][0])**2 + (dist[i][1]-dist[i+1][1])**2) for i,p in enumerate(dist[:-1])]))
 
+        plt.figure(figsize=(10,10))
         if args.gradient:
             # plt.imshow(mag_grad_field.transpose())#, interpolation='gaussian', cmap= 'gnuplot')
             if not args.test:
@@ -551,7 +599,7 @@ def main():
                 plt.imshow(field.transpose(), interpolation='gaussian', cmap= 'gnuplot')
         else:
             if not args.test:
-                plt.imshow(norm_field[:,:,0].transpose(), interpolation='gaussian', cmap= 'gnuplot')
+                plt.imshow(norm_field[:,:,0].transpose(), interpolation='gaussian', cmap= 'jet')
                 plt.xticks(np.arange(0,len(wd.lon_ticks), (1/min(field_resolution))), np.around(wd.lon_ticks[0::int(1/min(field_resolution))], 2))
                 plt.yticks(np.arange(0,len(wd.lat_ticks), (1/min(field_resolution))), np.around(wd.lat_ticks[0::int(1/min(field_resolution))], 2))
                 plt.xlabel('Longitude', fontsize=20)
@@ -642,10 +690,10 @@ def main():
                                                                     straight_line_str + \
                                                                     score_str + \
                                                                     rect_area_str + \
-                                                                    '.png'
+                                                                    '.eps'
 
         print(file_string)
-        plt.savefig(args.outfile_path + file_string)
+        plt.savefig(args.outfile_path + file_string, format='eps')
         plt.show()
     else:
         filename = args.outfile_path

@@ -298,6 +298,7 @@ def UCTPlayGame(field, start, budget, velocity_correction=1, end=None, direction
     state = GameState(field, start, budget, start, velocity_correction, end, direction_constr, same_point)
     return_path = start
     # print(state.GetMoves())
+    # startTime = time.monotonic()
     while (state.GetMoves() != []):
         # print(str(state))
         m = UCT(rootstate = state, itermax = 50000, verbose = False) # play with values for itermax and verbose = True
