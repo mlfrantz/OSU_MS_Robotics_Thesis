@@ -298,16 +298,20 @@ def UCTPlayGame(field, start, budget, velocity_correction=1, end=None, direction
     state = GameState(field, start, budget, start, velocity_correction, end, direction_constr, same_point)
     return_path = start
     # print(state.GetMoves())
-    # startTime = time.monotonic()
+    startTime = time.time()
+    times_comp = [(0,0)]
     while (state.GetMoves() != []):
         # print(str(state))
-        m = UCT(rootstate = state, itermax = 50000, verbose = False) # play with values for itermax and verbose = True
+        m = UCT(rootstate = state, itermax = 1000000, verbose = False) # play with values for itermax and verbose = True
         # print("Best Move: " + str(m) + "\n")
         state.DoMove(m)
         state.path = state.path[:] + [m]
         return_path.append(m)
+        times_comp.append((time.time()-startTime, sum([bilinear_interpolation(p, field) for p in return_path])))
         # print(str(state))
     print(return_path)
+    print(times_comp)
+
     return return_path
 
 def main():
