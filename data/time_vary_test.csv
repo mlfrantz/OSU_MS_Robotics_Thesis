@@ -1,4 +1,4 @@
-Experiment,Algorithm,Map,Map Center,Map Resolution,Start Point,End Point,Score,Run Time (sec),Budget (hours),Number of Robots,Constraints
+Experiment,Algorithm,Map,Map_Center,Map_Resolution,Start,End,Score,Run_Time_(sec),Budget_hours,Robots,Constraints
 Time_Vary_Map,MIP_Time_Vary,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1]",NA,7.342888807901187,0.6416258811950684,6.0,1,
 Time_Vary_Map,MIP_Time_Vary,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 5]",NA,9.455771810973026,2.582655906677246,6.0,1,
 Time_Vary_Map,MIP_Time_Vary,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 9]",NA,8.735830512012262,0.5085289478302002,6.0,1,
