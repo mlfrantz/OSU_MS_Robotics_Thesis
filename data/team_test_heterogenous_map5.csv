@@ -17,3 +17,4 @@ team_test_heterogenous_2_glider_2_rose,MCTS,roms/txla_hindcast_agg_full_2013_07_
 team_test_heterogenous_2_glider_2_rose,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,60.860886892999865,3600.0360758304596,4.0,4,
 team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,58.71755494394662,0.012641429901123047,4.0,4,
 team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,64.11901040396695,6988.240719795227,4.0,4,
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,69.26639399724655,0.0168764591217041,4.0,4,
