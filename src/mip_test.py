@@ -13,7 +13,78 @@ def normalize(data, index=0):
     # a specific time frame to normalize to.
     x_min = np.min(data[:,:,index])
     x_max = np.max(data[:,:,index])
-    return (data - x_min) / (x_max - x_min)
+    return (data[:,:,index] - x_min) / (x_max - x_min)
+
+def bilinear_interpolation(point, field, time=0):
+        # Solution courtesy of Raymond Hettinger
+        # https://stackoverflow.com/questions/8661537/how-to-perform-bilinear-interpolation-in-python
+    '''Interpolate (x,y) from point values associated with four points.
+
+    The four points are a list of four triplets:  (x, y, value).
+    The four points can be in any order.  They should form a rectangle.
+
+        >>> bilinear_interpolation(12, 5.5,
+        ...                        [(10, 4, 100),
+        ...                         (20, 4, 200),
+        ...                         (10, 6, 150),
+        ...                         (20, 6, 300)])
+        165.0
+
+    '''
+    # See formula at:  http://en.wikipedia.org/wiki/Bilinear_interpolation
+
+    x = point[0]
+    y = point[1]
+    try:
+        points = sorted(corners(point, field, time))               # order points by x, then by y
+        (x1, y1, q11), (_x1, y2, q12), (x2, _y1, q21), (_x2, _y2, q22) = points
+
+        if x1 != _x1 or x2 != _x2 or y1 != _y1 or y2 != _y2:
+            raise ValueError('points do not form a rectangle')
+        if not x1 <= x <= x2 or not y1 <= y <= y2:
+            raise ValueError('(x, y) not within the rectangle')
+
+        return (q11 * (x2 - x) * (y2 - y) +
+                q21 * (x - x1) * (y2 - y) +
+                q12 * (x2 - x) * (y - y1) +
+                q22 * (x - x1) * (y - y1)
+               ) / ((x2 - x1) * (y2 - y1) + 0.0)
+    except TypeError:
+        print("Failed, no solution.")
+
+def corners(point, field, time=0):
+    corners = []
+
+    pointX = point[0]
+    pointY = point[1]
+
+    for p in [pointX, pointY]:
+        if float(p) % 1 != 0.0:
+            # Means point is not an integer
+            upper = np.ceil(p)
+            lower = np.floor(p)
+        else:
+            if float(p) == 0.0:
+                lower = p
+                upper = 1
+            elif p == field.shape[0]-1:
+                upper = field.shape[0]-1
+                lower = upper - 1
+            else:
+                upper = p
+                lower = p + 1
+        corners.append(int(lower))
+        corners.append(int(upper))
+    try:
+        corners = [ (corners[0], corners[2], field[corners[0], corners[2], time]), \
+                    (corners[0], corners[3], field[corners[0], corners[3], time]), \
+                    (corners[1], corners[2], field[corners[1], corners[2], time]), \
+                    (corners[1], corners[3], field[corners[1], corners[3], time])]
+    except:
+        # pdb.set_trace()
+        print("Failed, no solution.")
+    return corners
+
 
 def main():
 
@@ -36,6 +107,11 @@ def main():
         '-g','--gradient',
         action='store_true',
         help='By adding this flag you will compute the gradient of the input field.',
+        )
+    parser.add_argument(
+        '--time_vary',
+        action='store_true',
+        help='By adding this flag you will vary the time input field monotonically.',
         )
     parser.add_argument(
         '-r', '--robots',
@@ -197,11 +273,14 @@ def main():
             # The '0' is the first time step and goes up to some max time
             # field = np.copy(wd.scalar_field[:,:,0])
             field = np.copy(wd.scalar_field)
+            # pdb.set_trace()
+            # norm_field = normalize(field)
+            # field = normalize(field) # This will normailze the field between 0-1
+            norm_field = np.array([normalize(field,i) for i in range(field.shape[2])])
+            norm_field = np.moveaxis(norm_field,0,-1)
+            field = np.copy(norm_field)
 
-            norm_field = normalize(field)
-            field = normalize(field) # This will normailze the field between 0-1
-
-            fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
+            # fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
             np.save(fieldSavePath, field)
 
         # Example of an obstacle, make the value very low in desired area
@@ -215,8 +294,10 @@ def main():
         field_resolution = (1,1)
 
     if args.gradient:
-        grad_field = np.gradient(field)
-        mag_grad_field = np.sqrt(grad_field[0]**2 + grad_field[1]**2)
+        # pdb.set_trace()
+        grad_field = np.gradient(field[:,:,0])
+
+        mag_grad_field = np.dot(grad_field[0],grad_field[1]) #np.sqrt(grad_field[1]**2)# + grad_field[1]**2)
 
     # Load the robots.yaml Configuration file.
     with open(os.path.expandvars(args.robots_cfg),'rb') as f:
@@ -305,7 +386,7 @@ def main():
     m.addConstrs((y[r, steps[r][0]] == start[r][1] for r in robots), name="Initial y")
 
     if args.gradient:
-        m.addConstrs((f[r, steps[r][0]] == mag_grad_field[start[r][0], start[r][1], 0] for r in robots), name="Initial f")
+        m.addConstrs((f[r, steps[r][0]] == mag_grad_field[start[r][0], start[r][1]] for r in robots), name="Initial f")
     else:
         m.addConstrs((f[r, steps[r][0]] == field[start[r][0], start[r][1], 0] for r in robots), name="Initial f")
 
@@ -328,12 +409,16 @@ def main():
     m.addConstrs((quicksum(DY[j]*ly[r,t,j] for j in DY) == y[r,t] for r in robots for t in steps[r]))
 
     if args.gradient:
-        m.addConstrs((quicksum(mag_grad_field[i,j,0]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
+        m.addConstrs((quicksum(mag_grad_field[i,j]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
     else:
-        # m.addConstrs((quicksum(field[i,j,field_time_steps[t]]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
-        m.addConstrs((quicksum(field[i,j,0]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
-    # Primary Motion constraints
+        if args.time_vary:
+            # This map is time varying
+            m.addConstrs((quicksum(field[i,j,field_time_steps[t]]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
+        else:
+            # This map is static
+            m.addConstrs((quicksum(field[i,j,0]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
 
+    # Primary Motion constraints
 
     # There is something to this but it doesnt work as is
     #
@@ -589,6 +674,7 @@ def main():
         if args.gradient:
             # plt.imshow(mag_grad_field.transpose())#, interpolation='gaussian', cmap= 'gnuplot')
             if not args.test:
+                plt.imshow(mag_grad_field[:,:].transpose(), interpolation='gaussian', cmap= 'jet')
                 plt.imshow(norm_field[:,:,0].transpose(), interpolation='gaussian', cmap= 'jet')
                 plt.xticks(np.arange(0,len(wd.lon_ticks), (1/min(field_resolution))), np.around(wd.lon_ticks[0::int(1/min(field_resolution))], 2))
                 plt.yticks(np.arange(0,len(wd.lat_ticks), (1/min(field_resolution))), np.around(wd.lat_ticks[0::int(1/min(field_resolution))], 2))
@@ -675,8 +761,13 @@ def main():
         else:
             rect_area_str = ''
 
-        obj = m.getObjective()
-        score_str = '_score_%f' % obj.getValue()
+        if args.time_vary:
+            obj = m.getObjective()
+            score_str = '_score_%f' % obj.getValue()
+        else:
+            # m.addConstrs((quicksum(field[i,j,field_time_steps[t]]*lxy[r,t,i,j] for i in DX for j in DY) == f[r,t] for r in robots for t in steps[r]))
+            score_str = '_score_%f' % sum([bilinear_interpolation(p, field) for path in paths for p in path])
+
 
         file_string = 'mip_run_' + time.strftime("%Y%m%d-%H%M%S") + \
                                                                     robots_str + \
@@ -696,6 +787,18 @@ def main():
         plt.savefig(args.outfile_path + file_string, format='eps')
         plt.show()
     else:
+        # Plotting Code
+        path_x = m.getAttr('X', x).values()
+        path_y = m.getAttr('X', y).values()
+        # print('Obj: %g' % obj.getValue())
+        _paths = list(zip(path_x, path_y))
+        paths = []
+        for r in robots:
+            paths.append(_paths[0:len(steps[r])])
+            _paths = _paths[len(steps[r]):]
+
+        print(paths)
+
         filename = args.outfile_path
         check_empty = os.path.exists(filename)
 
@@ -738,8 +841,15 @@ def main():
                             straight_line_str + \
                             rect_area_str
 
-        obj = m.getObjective()
-        score_str = obj.getValue()
+        if args.time_vary:
+            obj = m.getObjective()
+            score_str = obj.getValue()
+            alg_str = "MIP_Time_Vary"
+        else:
+            score_str = sum([bilinear_interpolation(p, field, field_time_steps[t]) for path in paths for t,p in enumerate(path)])
+            alg_str = "MIP"
+        # obj = m.getObjective()
+        # score_str = obj.getValue()
 
         with open(filename, 'a', newline='') as csvfile:
             fieldnames = [  'Experiment', \
@@ -761,7 +871,7 @@ def main():
                 writer.writeheader()
 
             writer.writerow({   'Experiment': args.experiment_name, \
-                                'Algorithm': 'MIP', \
+                                'Algorithm': alg_str, \
                                 'Map': str(yaml_sim['roms_file']), \
                                 'Map Center': Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']).__str__(), \
                                 'Map Resolution': (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']), \

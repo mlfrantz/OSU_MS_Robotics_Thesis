@@ -16,7 +16,7 @@ def normalize(data, index=0):
     x_max = np.max(data[:,:,index])
     return (data - x_min) / (x_max - x_min)
 
-def bilinear_interpolation(point, field):
+def bilinear_interpolation(point, field, time=0):
         # Solution courtesy of Raymond Hettinger
         # https://stackoverflow.com/questions/8661537/how-to-perform-bilinear-interpolation-in-python
     '''Interpolate (x,y) from point values associated with four points.
@@ -37,7 +37,7 @@ def bilinear_interpolation(point, field):
     x = point[0]
     y = point[1]
     try:
-        points = sorted(corners(point,field))               # order points by x, then by y
+        points = sorted(corners(point,field,time))               # order points by x, then by y
         (x1, y1, q11), (_x1, y2, q12), (x2, _y1, q21), (_x2, _y2, q22) = points
 
         if x1 != _x1 or x2 != _x2 or y1 != _y1 or y2 != _y2:
@@ -53,7 +53,7 @@ def bilinear_interpolation(point, field):
     except TypeError:
         print("Failed, no solution.")
 
-def corners(point,field):
+def corners(point, field, time=0):
     corners = []
 
     pointX = point[0]
@@ -77,10 +77,10 @@ def corners(point,field):
         corners.append(int(lower))
         corners.append(int(upper))
     try:
-        corners = [ (corners[0], corners[2], field[corners[0], corners[2], 0]), \
-                    (corners[0], corners[3], field[corners[0], corners[3], 0]), \
-                    (corners[1], corners[2], field[corners[1], corners[2], 0]), \
-                    (corners[1], corners[3], field[corners[1], corners[3], 0])]
+        corners = [ (corners[0], corners[2], field[corners[0], corners[2], time]), \
+                    (corners[0], corners[3], field[corners[0], corners[3], time]), \
+                    (corners[1], corners[2], field[corners[1], corners[2], time]), \
+                    (corners[1], corners[3], field[corners[1], corners[3], time])]
     except:
         # pdb.set_trace()
         print("Failed, no solution.")
