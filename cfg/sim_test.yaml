@@ -3,8 +3,8 @@ roms_file: roms/txla_hindcast_agg_full_2013_07_10.nc
 generate_dynamic_obstacles: true
 science_variable: temperature
 sim_world:
-  center_latitude: 28.82
-  center_longitude: -91.19
+  center_latitude: 28.8
+  center_longitude: -92.7
   width: 10
   height: 10
   resolution: 1

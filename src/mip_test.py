@@ -93,7 +93,7 @@ def main():
         '-i', '--infile_path',
         nargs='?',
         type=str,
-        default="/home/mlfrantz/Documents/MIP_Research/mip_research/test_fields/test_field_2.csv",
+        default="/home/mlfrantz/Documents/MIP_Research/mip_research/test_fields/fast_time_vary.npy",
         help='Input file that represents the world',
         )
     parser.add_argument(
@@ -290,8 +290,16 @@ def main():
 
     else:
         # Problem data, matrix transposed to allow for proper x,y coordinates to be mapped wih i,j
-        field = np.genfromtxt(args.infile_path, delimiter=',', dtype=float).transpose()
+        # field = np.genfromtxt(args.infile_path, delimiter=',', dtype=float).transpose()
         field_resolution = (1,1)
+        field = np.load(args.infile_path)
+        field = np.moveaxis(field,0,-1)
+        # field = np.transpose(field)
+        norm_field = np.load(args.infile_path)
+        norm_field = np.moveaxis(norm_field,0,-1)
+        pdb.set_trace()
+
+        print("Loaded Map Successfully")
 
     if args.gradient:
         # pdb.set_trace()
@@ -393,9 +401,9 @@ def main():
     # Optional end position constraint. Could implement additional position constaint
     if len(args.end_point) > 0 :
         end = args.end_point
-        m.addConstr((x[r, steps[r][-1]] == end[0] for r in robots), name="End x")
-        m.addConstr((y[r, steps[r][-1]] == end[1] for r in robots), name="End y")
-        m.addConstr((f[r, steps[r][-1]] == field[end[0], end[1], -1] for r in robots), name="End f")
+        m.addConstrs((x[r, steps[r][-1]] == end[0] for r in robots), name="End x")
+        m.addConstrs((y[r, steps[r][-1]] == end[1] for r in robots), name="End y")
+        # m.addConstr((f[r, steps[r][-1]] == field[end[0], end[1], -1] for r in robots), name="End f")
 
     for r in robots:
         for t in steps[r]:
@@ -585,12 +593,34 @@ def main():
     if args.force_curl:
         for r in robots:
             v = velocity_correction[r]
-            delta = 2
-            t_delta = 3
-            m.addConstrs(x[r,t-t_delta] - x[r,t] <= v*delta for t in steps[r][t_delta:])
-            m.addConstrs(x[r,t] - x[r,t-t_delta] <= v*delta for t in steps[r][t_delta:])
-            m.addConstrs(y[r,t-t_delta] - y[r,t] <= v*delta for t in steps[r][t_delta:])
-            m.addConstrs(y[r,t] - y[r,t-t_delta] <= v*delta for t in steps[r][t_delta:])
+            x_delta = 1
+            x_t_delta = 3
+            y_delta = 1
+            y_t_delta = 2
+
+            # This for x motion
+            m.addConstrs(x[r,t-x_t_delta] - x[r,t] <= v*x_delta for t in steps[r][x_t_delta:])
+            m.addConstrs(x[r,t] - x[r,t-x_t_delta] <= v*x_delta for t in steps[r][x_t_delta:])
+            t_range = range(2)
+            M = 1000
+            t1 = m.addVars(steps[r][y_t_delta:], t_range, vtype=GRB.BINARY, name='t1')
+            m.addConstrs(y[r,t-y_t_delta] - y[r,t] >= v*y_delta - M*t1[t,0] for t in steps[r][y_t_delta:])
+            m.addConstrs(y[r,t] - y[r,t-y_t_delta] >= v*y_delta - M*t1[t,1] for t in steps[r][y_t_delta:])
+            m.addConstrs(t1[t,0] + t1[t,1]  <= 1 for t in steps[r][y_t_delta:])
+            # m.addConstrs(y[r,t-y_t_delta] - y[r,t] <= v*y_delta for t in steps[r][y_t_delta:])
+            # m.addConstrs(y[r,t] - y[r,t-y_t_delta] <= v*y_delta for t in steps[r][y_t_delta:])
+
+            # This is for y motion
+            # m.addConstrs(y[r,t-y_t_delta] - y[r,t] <= v*y_delta for t in steps[r][y_t_delta:])
+            # m.addConstrs(y[r,t] - y[r,t-y_t_delta] <= v*y_delta for t in steps[r][y_t_delta:])
+            # t_range = range(2)
+            # M = 1000
+            # t1 = m.addVars(steps[r][x_t_delta:], t_range, vtype=GRB.BINARY, name='t1')
+            # m.addConstrs(x[r,t-x_t_delta] - x[r,t] >= v*x_delta - M*t1[t,0] for t in steps[r][x_t_delta:])
+            # m.addConstrs(x[r,t] - x[r,t-x_t_delta] >= v*x_delta - M*t1[t,1] for t in steps[r][x_t_delta:])
+            # m.addConstrs(t1[t,0] + t1[t,1]  <= 1 for t in steps[r][x_t_delta:])
+            # # m.addConstrs(y[r,t-t_delta] - y[r,t] <= v*y_delta for t in steps[r][t_delta:])
+            # # m.addConstrs(y[r,t] - y[r,t-t_delta] <= v*y_delta for t in steps[r][t_delta:])
 
     # Straight path constraints (Questionable functionality)
     if len(args.straight_line) > 0:
@@ -647,14 +677,6 @@ def main():
     #         print("%s %f" % (v.varName, v.X))
 
     if args.gen_image:
-        wd = World.roms(
-            datafile_path=yaml_sim['roms_file'],
-            xlen        = yaml_sim['sim_world']['width'],
-            ylen        = yaml_sim['sim_world']['height'],
-            center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
-            feature     = yaml_sim['science_variable'],
-            resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
-            )
 
         # Plotting Code
         path_x = m.getAttr('X', x).values()
@@ -674,6 +696,14 @@ def main():
         if args.gradient:
             # plt.imshow(mag_grad_field.transpose())#, interpolation='gaussian', cmap= 'gnuplot')
             if not args.test:
+                wd = World.roms(
+                    datafile_path=yaml_sim['roms_file'],
+                    xlen        = yaml_sim['sim_world']['width'],
+                    ylen        = yaml_sim['sim_world']['height'],
+                    center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
+                    feature     = yaml_sim['science_variable'],
+                    resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
+                    )
                 plt.imshow(mag_grad_field[:,:].transpose(), interpolation='gaussian', cmap= 'jet')
                 plt.imshow(norm_field[:,:,0].transpose(), interpolation='gaussian', cmap= 'jet')
                 plt.xticks(np.arange(0,len(wd.lon_ticks), (1/min(field_resolution))), np.around(wd.lon_ticks[0::int(1/min(field_resolution))], 2))
@@ -685,6 +715,14 @@ def main():
                 plt.imshow(field.transpose(), interpolation='gaussian', cmap= 'gnuplot')
         else:
             if not args.test:
+                wd = World.roms(
+                    datafile_path=yaml_sim['roms_file'],
+                    xlen        = yaml_sim['sim_world']['width'],
+                    ylen        = yaml_sim['sim_world']['height'],
+                    center      = Location(xlon=yaml_sim['sim_world']['center_longitude'], ylat=yaml_sim['sim_world']['center_latitude']),
+                    feature     = yaml_sim['science_variable'],
+                    resolution  = (yaml_sim['sim_world']['resolution'],yaml_sim['sim_world']['resolution']),
+                    )
                 plt.imshow(norm_field[:,:,0].transpose(), interpolation='gaussian', cmap= 'jet')
                 plt.xticks(np.arange(0,len(wd.lon_ticks), (1/min(field_resolution))), np.around(wd.lon_ticks[0::int(1/min(field_resolution))], 2))
                 plt.yticks(np.arange(0,len(wd.lat_ticks), (1/min(field_resolution))), np.around(wd.lat_ticks[0::int(1/min(field_resolution))], 2))
@@ -692,7 +730,7 @@ def main():
                 plt.ylabel('Latitude', fontsize=20)
                 plt.text(1.25, 0.5, "normalized " + str(yaml_sim['science_variable']),{'fontsize':20}, horizontalalignment='left', verticalalignment='center', rotation=90, clip_on=False, transform=plt.gca().transAxes)
             else:
-                plt.imshow(field.transpose(), interpolation='gaussian', cmap= 'gnuplot')
+                plt.imshow(field[:,:,int(args.planning_time)], interpolation='gaussian', cmap= 'jet')
 
         plt.colorbar()
         for i,path in enumerate(paths):
