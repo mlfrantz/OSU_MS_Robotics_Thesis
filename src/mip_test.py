@@ -601,12 +601,12 @@ def main():
             # This for x motion
             m.addConstrs(x[r,t-x_t_delta] - x[r,t] <= v*x_delta for t in steps[r][x_t_delta:])
             m.addConstrs(x[r,t] - x[r,t-x_t_delta] <= v*x_delta for t in steps[r][x_t_delta:])
-            t_range = range(2)
-            M = 1000
-            t1 = m.addVars(steps[r][y_t_delta:], t_range, vtype=GRB.BINARY, name='t1')
-            m.addConstrs(y[r,t-y_t_delta] - y[r,t] >= v*y_delta - M*t1[t,0] for t in steps[r][y_t_delta:])
-            m.addConstrs(y[r,t] - y[r,t-y_t_delta] >= v*y_delta - M*t1[t,1] for t in steps[r][y_t_delta:])
-            m.addConstrs(t1[t,0] + t1[t,1]  <= 1 for t in steps[r][y_t_delta:])
+            # t_range = range(2)
+            # M = 1000
+            # t1 = m.addVars(steps[r][y_t_delta:], t_range, vtype=GRB.BINARY, name='t1')
+            # m.addConstrs(y[r,t-y_t_delta] - y[r,t] >= v*y_delta - M*t1[t,0] for t in steps[r][y_t_delta:])
+            # m.addConstrs(y[r,t] - y[r,t-y_t_delta] >= v*y_delta - M*t1[t,1] for t in steps[r][y_t_delta:])
+            # m.addConstrs(t1[t,0] + t1[t,1]  <= 1 for t in steps[r][y_t_delta:])
             # m.addConstrs(y[r,t-y_t_delta] - y[r,t] <= v*y_delta for t in steps[r][y_t_delta:])
             # m.addConstrs(y[r,t] - y[r,t-y_t_delta] <= v*y_delta for t in steps[r][y_t_delta:])
 
@@ -619,8 +619,8 @@ def main():
             # m.addConstrs(x[r,t-x_t_delta] - x[r,t] >= v*x_delta - M*t1[t,0] for t in steps[r][x_t_delta:])
             # m.addConstrs(x[r,t] - x[r,t-x_t_delta] >= v*x_delta - M*t1[t,1] for t in steps[r][x_t_delta:])
             # m.addConstrs(t1[t,0] + t1[t,1]  <= 1 for t in steps[r][x_t_delta:])
-            # # m.addConstrs(y[r,t-t_delta] - y[r,t] <= v*y_delta for t in steps[r][t_delta:])
-            # # m.addConstrs(y[r,t] - y[r,t-t_delta] <= v*y_delta for t in steps[r][t_delta:])
+            # m.addConstrs(y[r,t-t_delta] - y[r,t] <= v*y_delta for t in steps[r][t_delta:])
+            # m.addConstrs(y[r,t] - y[r,t-t_delta] <= v*y_delta for t in steps[r][t_delta:])
 
     # Straight path constraints (Questionable functionality)
     if len(args.straight_line) > 0:
