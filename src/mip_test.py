@@ -175,7 +175,7 @@ def main():
         '--sync',
         nargs='?',
         type=str,
-        default='None',
+        default='',
         help='Sets the direction of the Synchronization constraint. Default is no Synchronization. \
         "ns" goes from north to south. \
         "sn" goes from south to north. \
@@ -504,7 +504,7 @@ def main():
     elif args.sync == 'ew':
         for r in robots:
             v = velocity_correction[r]
-            for t in steps[r][3:7]:
+            for t in steps[r][1:]:
                 m.addConstr(x[r,t-1] - x[r,t] == v)
                 m.addConstr(y[r,t-1] - y[r,t] == 0)
     elif args.sync == 'we':
@@ -873,11 +873,17 @@ def main():
         else:
             rect_area_str = ''
 
+        if len(args.sync) > 0:
+            sync_str = 'sync'
+        else:
+            sync_str =''
+
         constraint_string = collision_str + \
                             dir_str + anti_curl_str + \
                             force_curl_str + \
                             straight_line_str + \
-                            rect_area_str
+                            rect_area_str + \
+                            sync_str
 
         if args.time_vary:
             obj = m.getObjective()

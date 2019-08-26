@@ -16,7 +16,7 @@ glider3:
 glider4:
   vel: 0.4 # m/s
   type: 'glider'
-  color: 'white'
+  color: 'yellow'
 
 glider5:
   vel: 0.4 # m/s
