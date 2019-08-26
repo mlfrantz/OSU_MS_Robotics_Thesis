@@ -1,0 +1,113 @@
+Experiment,Algorithm,Map,Map_Center,Map_Resolution,Start,End,Score,Run_Time_(sec),Budget_hours,Robots,Constraints
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9]",NA,16.4199240757,0.7921831608,2,2,1_Fast_1_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9]",NA,16.4187727306,0.0031254292,2,2,1_Fast_1_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9]",NA,15.9886553659,182.5726423264,2,2,1_Fast_1_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9]",NA,33.8782901493,3600.0088419914,4,2,1_Fast_1_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9]",NA,33.8163187941,0.0062038898,4,2,1_Fast_1_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9]",NA,33.0209483365,2006.987705946,4,2,1_Fast_1_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9]",NA,17.2247918835,3600.0418908596,2,2,1_Fast_1_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9]",NA,17.1037792914,0.0026292801,2,2,1_Fast_1_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9]",NA,15.7278634836,220.2620108128,2,2,1_Fast_1_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9]",NA,32.4691682407,3600.0036828518,4,2,1_Fast_1_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9]",NA,30.8909320006,0.0099523067,4,2,1_Fast_1_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9]",NA,30.5414243466,2227.2125136852,4,2,1_Fast_1_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9]",NA,14.5103885748,118.3384258747,2,2,1_Fast_1_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9]",NA,14.4401059628,0.004226923,2,2,1_Fast_1_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9]",NA,11.5966185863,243.7716705799,2,2,1_Fast_1_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9]",NA,34.2445741339,3600.003633976,4,2,1_Fast_1_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9]",NA,33.9371613003,0.0086071491,4,2,1_Fast_1_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9]",NA,27.5873798107,2430.4787695408,4,2,1_Fast_1_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9]",NA,11.9731417228,3600.0203638077,2,2,1_Fast_1_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9]",NA,11.4737840738,0.0023181438,2,2,1_Fast_1_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9]",NA,9.9752224421,259.0465180874,2,2,1_Fast_1_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9]",NA,24.0846417432,3610.410490036,4,2,1_Fast_1_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9]",NA,20.8809598916,0.0077736378,4,2,1_Fast_1_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9]",NA,21.0702974518,2082.4580395222,4,2,1_Fast_1_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9]",NA,17.2640062996,1793.5273928642,2,2,1_Fast_1_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9]",NA,15.7958563202,0.0023956299,2,2,1_Fast_1_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9]",NA,16.8232870401,241.4734835625,2,2,1_Fast_1_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9]",NA,33.9703747088,3600.0020039082,4,2,1_Fast_1_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9]",NA,32.2702940738,0.0062384605,4,2,1_Fast_1_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9]",NA,33.8149853081,3532.9601736069,4,2,1_Fast_1_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,23.6530369756,19.6051120758,2,3,1_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,23.3588665735,0.0031533241,2,3,1_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,23.0522899064,307.4294822216,2,3,1_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,47.6949027334,3613.9611849785,4,3,1_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,47.4677532835,0.0110418797,4,3,1_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,42.859688317,3045.0353181362,4,3,1_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,28.7791952575,3600.0396649838,2,3,1_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,26.1110231307,0.0045762062,2,3,1_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,27.1057933171,326.9834620953,2,3,1_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,54.4254740744,3600.0026400089,4,3,1_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,52.7239343069,0.010176897,4,3,1_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,47.8742201845,4707.8603365421,4,3,1_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,22.1514494428,3600.0632901192,2,3,1_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,21.7810989718,0.0039875507,2,3,1_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,21.3425124933,649.6821551323,2,3,1_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,51.8595544934,3600.0045759678,4,3,1_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,48.4802719333,0.0144445896,4,3,1_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,49.0426400777,3318.1298401356,4,3,1_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,22.7278625269,98.6647319794,2,3,1_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,20.7642457546,0.0032298565,2,3,1_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,20.4986159678,304.2351403236,2,3,1_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,42.8770833611,3600.0020627976,4,3,1_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,42.6708866706,0.0099351406,4,3,1_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,42.3548260267,3039.7901110649,4,3,1_Fast_2_Slow
+team_test_heterogenous_2_glider_1_rose,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,25.8802830559,3602.5951499939,2,3,1_Fast_2_Slow
+team_test_heterogenous_2_glider_1_rose,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,20.5720863838,0.0042014122,2,3,1_Fast_2_Slow
+team_test_heterogenous_2_glider_1_rose,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,24.7870423152,441.1487452984,2,3,1_Fast_2_Slow
+team_test_heterogenous_2_glider_1_rose,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,48.7359048639,3600.0024209023,4,3,1_Fast_2_Slow
+team_test_heterogenous_2_glider_1_rose,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,46.7571795549,0.0114297867,4,3,1_Fast_2_Slow
+team_test_heterogenous_2_glider_1_rose,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 5, 5]",NA,46.7008017454,5478.732487917,4,3,1_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,31.3077486927,3600.0373220444,2,4,2_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,31.1764354095,0.0043404102,2,4,2_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,30.5374128239,391.0954165459,2,4,2_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,63.1913769775,3600.0122289658,4,4,2_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,63.4837118618,0.019878149,4,4,2_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,61.5873438643,4036.4344284535,4,4,2_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,36.5502339533,3600.0044829846,2,4,2_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,35.1103399009,0.0049877167,2,4,2_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,32.4311997413,490.3847453594,2,4,2_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,69.8896464436,3600.0181410313,4,4,2_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,68.6675128805,0.0131490231,4,4,2_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,64.5197173097,6081.7611949444,4,4,2_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,31.3307027036,3552.6788520813,2,4,2_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,31.0984277851,0.0067560673,2,4,2_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,27.5427386659,418.2956020832,2,4,2_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,69.4556651351,3600.002409935,4,4,2_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,69.2663939972,0.0147402287,4,4,2_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,62.8671530476,5221.1553766728,4,4,2_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,31.3387702232,29.5577230453,2,4,2_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,30.2484733199,0.003837347,2,4,2_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,28.1010521041,360.9924128056,2,4,2_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,59.8269963673,0.0122303963,4,4,2_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,55.6109690665,4404.7950892449,4,4,2_Fast_2_Slow
+team_test_heterogenous_2_glider_2_rose,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,33.7673117518,3600.0508589745,2,4,2_Fast_2_Slow
+team_test_heterogenous_2_glider_2_rose,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,30.5417424101,0.0040860176,2,4,2_Fast_2_Slow
+team_test_heterogenous_2_glider_2_rose,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,31.5559630465,524.586659193,2,4,2_Fast_2_Slow
+team_test_heterogenous_2_glider_2_rose,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,60.860886893,3600.0360758305,4,4,2_Fast_2_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,58.7175549439,0.0126414299,4,4,2_Fast_2_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -93.25000, yLat: 28.75000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1]",NA,64.119010404,6988.2407197952,4,4,2_Fast_2_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,46.6434926477,3600.0165150166,2,6,2_Fast_4_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,46.2791931802,0.0087976456,2,6,2_Fast_4_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,45.5864172575,599.6278164387,2,6,2_Fast_4_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,52.3165142717,3600.024477005,2,6,2_Fast_4_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,49.195339592,0.0165231228,2,6,2_Fast_4_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,50.4016640284,1451.3457849026,2,6,2_Fast_4_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,50.4872647009,3600.0047190189,2,6,2_Fast_4_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,49.9565607849,0.0085701942,2,6,2_Fast_4_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,48.5780493967,594.3830051422,2,6,2_Fast_4_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,45.1510340767,210.9269580841,2,6,2_Fast_4_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,43.2243231497,0.0063445568,2,6,2_Fast_4_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5]",NA,39.5055834082,609.6598846912,2,6,2_Fast_4_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5, 5, 1, 5, 9]",NA,65.1381458325,3600.0051848888,2,8,4_Fast_4_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5, 5, 1, 5, 9]",NA,64.6238192764,0.0083804131,2,8,4_Fast_4_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -96.50000, yLat: 25.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5, 5, 1, 5, 9]",NA,63.3353269181,758.4243528843,2,8,4_Fast_4_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5, 5, 1, 5, 9]",NA,72.3818550167,3600.0046038628,2,8,4_Fast_4_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.19000, yLat: 28.82000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5, 5, 1, 5, 9]",NA,69.0627029521,0.0125193596,2,8,4_Fast_4_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5, 5, 1, 5, 9]",NA,70.2357990083,3600.0054600239,2,8,4_Fast_4_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5, 5, 1, 5, 9]",NA,69.6587138506,0.0120103359,2,8,4_Fast_4_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -91.70000, yLat: 29.00000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5, 5, 1, 5, 9]",NA,64.4431596335,1806.3628883362,2,8,4_Fast_4_Slow
+team_test_heterogenous,MIP,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5, 5, 1, 5, 9]",NA,62.9059084438,3600.0055987835,2,8,4_Fast_4_Slow
+team_test_heterogenous,Greedy,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5, 5, 1, 5, 9]",NA,60.8505666898,0.0095858574,2,8,4_Fast_4_Slow
+team_test_heterogenous,MCTS,roms/txla_hindcast_agg_full_2013_07_10.nc,"xLon: -92.70000, yLat: 28.80000","(1, 1)","[1, 1, 9, 9, 1, 9, 9, 1, 1, 5, 9, 5, 5, 1, 5, 9]",NA,56.0820276471,761.691024065,2,8,4_Fast_4_Slow
