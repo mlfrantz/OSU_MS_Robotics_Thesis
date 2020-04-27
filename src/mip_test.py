@@ -488,6 +488,19 @@ def main():
                     m.addConstr(y[r,s]-y[r,t] >= 0.1 - M*t1[j,3])
                     m.addConstr(t1[j,0] + t1[j,1] + t1[j,2] + t1[j,3] <= 3)
 
+    # if args.same_point:
+    #     M = 100
+    #     for i,r in enumerate(robots):
+    #         for j,p in enumerate(robots):
+    #             for k,t in enumerate(steps[r][1:]):
+    #                 t1 = m.addVars(t, range(4), vtype=GRB.BINARY, name='t%d'% (t+r+p))
+    #                 # for j,s in enumerate(steps[r][:i+1]):
+    #                 m.addConstr(x[r,t]-x[p,t] >= 0.1 - M*t1[k,0])
+    #                 m.addConstr(x[p,t]-x[r,t] >= 0.1 - M*t1[k,1])
+    #                 m.addConstr(y[r,t]-y[p,t] >= 0.1 - M*t1[k,2])
+    #                 m.addConstr(y[p,t]-y[r,t] >= 0.1 - M*t1[k,3])
+    #                 m.addConstr(t1[k,0] + t1[k,1] + t1[k,2] + t1[k,3] <= 3)
+
     # Synchronization Constraint: Specific path or 8 direction [NS, EW, NE-SW, NW-SE]
     if args.sync == 'ns':
         for r in robots:
@@ -544,13 +557,14 @@ def main():
         path_len = np.sum(np.abs(np.subtract(path[:-1],path[1:])))
         for r in robots:
             v = velocity_correction[r]
-            for t in steps[r][1:len(path)]:
-                m.addConstr(x[r,t] - x[r,t-1] == path[t][0] - path[t-1][0])
-                m.addConstr(y[r,t] - y[r,t-1] == path[t][1] - path[t-1][1])
+            for i,t in enumerate(steps[r][4:3+len(path)]):
+                print(i,t)
+                m.addConstr(x[r,t] - x[r,t-1] == path[i+1][0] - path[i][0])
+                m.addConstr(y[r,t] - y[r,t-1] == path[i+1][1] - path[i][1])
     elif args.sync == 'path_time':
         #path = [(0,5), (1,4), (2,3), (3,2), (4,1), (5,0), (6,1), (7,2), (8,3), (9,4), (10,5), (9,6), (8,7), \
         #(7,8), (6,9), (5,10), (4,9), (3,8), (2,7), (1,6), (0,5)]
-        path = [(3,3,5),(4,3,6),(4,4,7), (3,4,8), (2,4,9), (2,3,10)]
+        path = [(4,3,7),(5,4,8),(6,5,9), (7,6,10), (7,7,11)]#, (2,6,10)]
         path_len = np.sum(np.abs(np.subtract(path[:-1],path[1:])))
         for r in robots:
             v = velocity_correction[r]
@@ -594,7 +608,7 @@ def main():
         for r in robots:
             v = velocity_correction[r]
             x_delta = 1
-            x_t_delta = 3
+            x_t_delta = 2
             y_delta = 1
             y_t_delta = 2
 
@@ -607,8 +621,8 @@ def main():
             # m.addConstrs(y[r,t-y_t_delta] - y[r,t] >= v*y_delta - M*t1[t,0] for t in steps[r][y_t_delta:])
             # m.addConstrs(y[r,t] - y[r,t-y_t_delta] >= v*y_delta - M*t1[t,1] for t in steps[r][y_t_delta:])
             # m.addConstrs(t1[t,0] + t1[t,1]  <= 1 for t in steps[r][y_t_delta:])
-            # m.addConstrs(y[r,t-y_t_delta] - y[r,t] <= v*y_delta for t in steps[r][y_t_delta:])
-            # m.addConstrs(y[r,t] - y[r,t-y_t_delta] <= v*y_delta for t in steps[r][y_t_delta:])
+            m.addConstrs(y[r,t-y_t_delta] - y[r,t] <= v*y_delta for t in steps[r][y_t_delta:])
+            m.addConstrs(y[r,t] - y[r,t-y_t_delta] <= v*y_delta for t in steps[r][y_t_delta:])
 
             # This is for y motion
             # m.addConstrs(y[r,t-y_t_delta] - y[r,t] <= v*y_delta for t in steps[r][y_t_delta:])
@@ -725,10 +739,16 @@ def main():
                     )
                 plt.imshow(norm_field[:,:,0].transpose(), interpolation='gaussian', cmap= 'jet')
                 plt.xticks(np.arange(0,len(wd.lon_ticks), (1/min(field_resolution))), np.around(wd.lon_ticks[0::int(1/min(field_resolution))], 2))
-                plt.yticks(np.arange(0,len(wd.lat_ticks), (1/min(field_resolution))), np.around(wd.lat_ticks[0::int(1/min(field_resolution))], 2))
+                # plt.xticks(rotation=30)
+                plt.yticks(np.flip(np.arange(0,len(wd.lat_ticks), (1/min(field_resolution))), axis=0), np.around(wd.lat_ticks[0::int(1/min(field_resolution))], 2))
+                # plt.xticks(np.arange(11),np.arange(1,12), fontsize=20)
+                # plt.yticks(np.arange(11), np.arange(1,12), fontsize=20)
                 plt.xlabel('Longitude', fontsize=20)
                 plt.ylabel('Latitude', fontsize=20)
+                # plt.xlabel('Local X Coordinate', fontsize=20)
+                # plt.ylabel('Local Y Coordinate', fontsize=20)
                 plt.text(1.25, 0.5, "normalized " + str(yaml_sim['science_variable']),{'fontsize':20}, horizontalalignment='left', verticalalignment='center', rotation=90, clip_on=False, transform=plt.gca().transAxes)
+                # plt.grid(b=True, which='both', axis='both')
             else:
                 plt.imshow(field[:,:,int(args.planning_time)], interpolation='gaussian', cmap= 'jet')
 
