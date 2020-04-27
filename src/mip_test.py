@@ -1,5 +1,12 @@
 #!/home/mlfrantz/miniconda2/bin/python3.6
 
+"""
+This is the main script for running the MIP code. You will have download the gurobi library by obtaining an academic account (https://pages.gurobi.com/registration).
+
+The code is run from the command line. Please see the /scripts folder for examples.
+
+"""
+
 import sys, pdb, time, argparse, os, csv
 import oyaml as yaml
 import numpy as np
@@ -36,7 +43,7 @@ def bilinear_interpolation(point, field, time=0):
     x = point[0]
     y = point[1]
     try:
-        points = sorted(corners(point, field, time))               # order points by x, then by y
+        points = sorted(corners(point, field, time)) # order points by x, then by y
         (x1, y1, q11), (_x1, y2, q12), (x2, _y1, q21), (_x2, _y2, q22) = points
 
         if x1 != _x1 or x2 != _x2 or y1 != _y1 or y2 != _y2:
@@ -53,6 +60,8 @@ def bilinear_interpolation(point, field, time=0):
         print("Failed, no solution.")
 
 def corners(point, field, time=0):
+    # This is used in conjunction with the bilinear_interpolation function for
+    # corner cases to avoid values outside the desired field boundaries
     corners = []
 
     pointX = point[0]
@@ -125,7 +134,7 @@ def main():
         nargs='?',
         type=str,
         default='cfg/robots.yaml',
-        help='Configuration file of robots availalbe for planning.',
+        help='Configuration file of robots available for planning.',
         )
     parser.add_argument(
         '--sim_cfg',
@@ -139,7 +148,7 @@ def main():
         nargs='?',
         type=float,
         default=5,
-        help='Length of the path to be planned in (units).',
+        help='Length of the path to be planned in time (hours).',
         )
     parser.add_argument(
         '-s', '--start_point',
@@ -160,7 +169,7 @@ def main():
         nargs='?',
         type=float,
         default=0.0,
-        help='Time limit in seconds you want to stop the simulation. Default lets it run until completion.',
+        help='Real time limit in seconds you want to stop the simulation. Default lets it run until completion.',
         )
     parser.add_argument(
         '-d', '--direction_constr',
@@ -186,7 +195,7 @@ def main():
     parser.add_argument(
         '--same_point',
         action='store_false',
-        help='By default it will not allow a point to be visited twice in the same planning period.',
+        help='By default it will not allow a point to be visited twice in the same planning period. Include this flag to allow, might allow for more flexible planning.',
         )
     parser.add_argument(
         '--anti_curl',
@@ -252,6 +261,7 @@ def main():
         with open(os.path.expandvars(args.sim_cfg),'rb') as f:
             yaml_sim = yaml.load(f.read())
 
+        # If running many test on the same map this will save you time by not having to reload the map from scratch each run. Saved me probably 10s of hours.
         fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field_{}_{}.npy'.format(str(abs(yaml_sim['sim_world']['center_longitude'])),yaml_sim['sim_world']['center_latitude'])
 
         try:
@@ -279,8 +289,6 @@ def main():
             norm_field = np.array([normalize(field,i) for i in range(field.shape[2])])
             norm_field = np.moveaxis(norm_field,0,-1)
             field = np.copy(norm_field)
-
-            # fieldSavePath = '/home/mlfrantz/Documents/MIP_Research/mip_research/cfg/normal_field.npy'
             np.save(fieldSavePath, field)
 
         # Example of an obstacle, make the value very low in desired area
@@ -302,9 +310,10 @@ def main():
         print("Loaded Map Successfully")
 
     if args.gradient:
+        # I would advise not using this as I don't believe it was doing what I thought it was.
+
         # pdb.set_trace()
         grad_field = np.gradient(field[:,:,0])
-
         mag_grad_field = np.dot(grad_field[0],grad_field[1]) #np.sqrt(grad_field[1]**2)# + grad_field[1]**2)
 
     # Load the robots.yaml Configuration file.
@@ -331,7 +340,7 @@ def main():
     velocity_correction = [t/max(temp_len) for t in temp_len] # To account for time difference between arriving to waypoints
     # velocity_correction = [1 for t in temp_len] # To account for time difference between arriving to waypoints
 
-    # Make time correction for map forward propagation
+    # Make time correction for map forward propagation. This is only used on time-varying maps.
     max_steps = max([len(s) for s in steps])
     field_delta = int(max_steps/Np)
     t_step = 0
@@ -350,10 +359,11 @@ def main():
     DX = np.arange(field.shape[0]) # Integer values for range of X coordinates
     DY = np.arange(field.shape[1]) # Integer values for range of Y coordinates
 
-    m = Model()
+    m = Model() # This defines a model inside Gurobi.
     if args.time_limit > 0:
+        # Sets a runtime limit. Default is to run to completion.
         m.Params.TIME_LIMIT = args.time_limit
-    # m.Params.MIPGap = 0.01
+    # m.Params.MIPGap = 0.01 # Allows the model to run until the solution is within a certain range of the optimal.
 
     # Add variables
     pairs = tuplelist([(r,s) for r in robots for s in steps[r]])
@@ -487,19 +497,6 @@ def main():
                     m.addConstr(y[r,t]-y[r,s] >= 0.1 - M*t1[j,2])
                     m.addConstr(y[r,s]-y[r,t] >= 0.1 - M*t1[j,3])
                     m.addConstr(t1[j,0] + t1[j,1] + t1[j,2] + t1[j,3] <= 3)
-
-    # if args.same_point:
-    #     M = 100
-    #     for i,r in enumerate(robots):
-    #         for j,p in enumerate(robots):
-    #             for k,t in enumerate(steps[r][1:]):
-    #                 t1 = m.addVars(t, range(4), vtype=GRB.BINARY, name='t%d'% (t+r+p))
-    #                 # for j,s in enumerate(steps[r][:i+1]):
-    #                 m.addConstr(x[r,t]-x[p,t] >= 0.1 - M*t1[k,0])
-    #                 m.addConstr(x[p,t]-x[r,t] >= 0.1 - M*t1[k,1])
-    #                 m.addConstr(y[r,t]-y[p,t] >= 0.1 - M*t1[k,2])
-    #                 m.addConstr(y[p,t]-y[r,t] >= 0.1 - M*t1[k,3])
-    #                 m.addConstr(t1[k,0] + t1[k,1] + t1[k,2] + t1[k,3] <= 3)
 
     # Synchronization Constraint: Specific path or 8 direction [NS, EW, NE-SW, NW-SE]
     if args.sync == 'ns':
